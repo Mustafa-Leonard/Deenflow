@@ -1,0 +1,10 @@
+Django>=4.2
+djangorestframework>=3.14
+djangorestframework-simplejwt>=2.8
+psycopg2-binary>=2.9
+django-cors-headers>=4.0
+python-dotenv>=1.0
+openai>=0.27.0
+jsonschema>=4.17.3
+django-ratelimit>=3.0
+dj-database-url>=1.0
