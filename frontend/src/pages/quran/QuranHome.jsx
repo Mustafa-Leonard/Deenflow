@@ -1,16 +1,35 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import api from '../../api'
 import Card from '../../components/Card'
 
 export default function QuranHome() {
+    const navigate = useNavigate()
+    const location = useLocation()
     const [surahs, setSurahs] = useState([])
     const [juzList, setJuzList] = useState(Array.from({ length: 30 }, (_, i) => i + 1))
-    const [activeTab, setActiveTab] = useState('surahs') // 'surahs' or 'juz'
+
+    // Initialize activeTab from search params
+    const getInitialTab = () => {
+        const params = new URLSearchParams(location.search)
+        const tab = params.get('tab')
+        if (tab === 'juz') return 'juz'
+        return 'surahs'
+    }
+
+    const [activeTab, setActiveTab] = useState(getInitialTab())
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [recentProgress, setRecentProgress] = useState(null)
-    const navigate = useNavigate()
+
+    // Sync activeTab with search params if they change
+    useEffect(() => {
+        const params = new URLSearchParams(location.search)
+        const tab = params.get('tab')
+        if (tab === 'juz' || tab === 'surahs') {
+            setActiveTab(tab)
+        }
+    }, [location.search])
 
     useEffect(() => {
         fetchData()

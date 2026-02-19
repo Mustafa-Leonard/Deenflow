@@ -10,13 +10,13 @@ export default function Layout() {
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar aria-label="Sidebar" />
-        <main className="flex-1 overflow-auto p-10 bg-slate-50/50 dark:bg-slate-950/50 ml-72 transition-all transition-colors duration-300">
-          <div className="max-w-6xl mx-auto">
+        <main className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-950/50 ml-72 transition-all transition-colors duration-300">
+          <div className="max-w-6xl mx-auto p-10">
             <Outlet />
           </div>
+          <Footer />
         </main>
       </div>
-      <Footer />
     </div>
   )
 }

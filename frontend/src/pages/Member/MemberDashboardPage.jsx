@@ -15,6 +15,7 @@ export default function MemberDashboardPage() {
     const [recentQuestions, setRecentQuestions] = useState([])
     const [suggestedTopics, setSuggestedTopics] = useState([])
     const [dailyAyah, setDailyAyah] = useState(null)
+    const [extras, setExtras] = useState(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -23,17 +24,19 @@ export default function MemberDashboardPage() {
 
     const fetchDashboardData = async () => {
         try {
-            const [statsRes, questionsRes, topicsRes, ayahRes] = await Promise.all([
-                api.get('/guidance/member/stats/'),
-                api.get('/guidance/recent/'),
-                api.get('/guidance/suggested-topics/'),
-                api.get('/guidance/daily-ayah/')
+            const [statsRes, questionsRes, topicsRes, ayahRes, extrasRes] = await Promise.all([
+                api.get('/auth/member/stats/'),
+                api.get('/auth/member/recent/'),
+                api.get('/auth/member/suggested-topics/'),
+                api.get('/auth/member/daily-ayah/'),
+                api.get('/auth/member/extras/')
             ])
 
             setStats(statsRes.data)
             setRecentQuestions(questionsRes.data)
             setSuggestedTopics(topicsRes.data)
             setDailyAyah(ayahRes.data)
+            setExtras(extrasRes.data)
         } catch (error) {
             console.error('Failed to fetch dashboard data:', error)
         } finally {
@@ -118,7 +121,15 @@ export default function MemberDashboardPage() {
             {/* Stats Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatsCard
-                    title="Questions Asked"
+                    title="Salah Streak"
+                    value={`${stats.salahStreak} Days`}
+                    icon="streak"
+                    customIcon={<span className="text-2xl">🔥</span>}
+                    color="orange"
+                    onClick={() => navigate('/app/tracker')}
+                />
+                <StatsCard
+                    title="Questions"
                     value={stats.totalQuestions}
                     icon="💬"
                     color="blue"
@@ -133,20 +144,12 @@ export default function MemberDashboardPage() {
                     onClick={() => navigate('/app/saved')}
                 />
                 <StatsCard
-                    title="Learning Progress"
+                    title="Spirit Score"
                     value={`${stats.learningProgress}%`}
                     icon="books"
-                    customIcon={<span className="text-2xl">📚</span>}
+                    customIcon={<span className="text-2xl">✨</span>}
                     color="green"
                     onClick={() => navigate('/app/learning')}
-                />
-                <StatsCard
-                    title="Community Points"
-                    value={stats.communityParticipation}
-                    icon="star"
-                    customIcon={<span className="text-2xl">⭐</span>}
-                    color="orange"
-                    onClick={() => navigate('/app/community')}
                 />
             </div>
 
@@ -316,9 +319,52 @@ export default function MemberDashboardPage() {
                             </button>
                         </div>
                     </div>
+                    {/* Social Impact Card */}
+                    {extras && (
+                        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                            <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                                <h3 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-sm">Social Impact</h3>
+                                <div className="text-brand-600 dark:text-brand-400 font-bold text-sm">
+                                    ${extras.walletBalance}
+                                </div>
+                            </div>
+                            <div className="p-6">
+                                {extras.featuredCampaign ? (
+                                    <div className="space-y-4">
+                                        <div>
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Featured Goal</span>
+                                                <span className="text-xs font-bold text-emerald-600">{extras.featuredCampaign.progress.toFixed(0)}%</span>
+                                            </div>
+                                            <div className="text-sm font-bold text-slate-900 dark:text-white mb-2">{extras.featuredCampaign.title}</div>
+                                            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                                                <div className="bg-emerald-500 h-2 rounded-full transition-all duration-1000" style={{ width: `${extras.featuredCampaign.progress}%` }}></div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => navigate('/app/donations')}
+                                            className="w-full px-4 py-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-xl font-bold transition-all text-sm hover:bg-emerald-100 dark:hover:bg-emerald-900/40"
+                                        >
+                                            Automate Zakat
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-4">
+                                        <p className="text-sm text-slate-500 mb-4">No active campaigns.</p>
+                                        <button
+                                            onClick={() => navigate('/app/donations')}
+                                            className="text-brand-600 text-sm font-bold hover:underline"
+                                        >
+                                            Explore Campaigns
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

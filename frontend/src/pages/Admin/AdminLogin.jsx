@@ -15,8 +15,9 @@ export default function AdminLogin() {
         setLoading(true)
 
         try {
-            console.log('Attempting admin login for:', formData.username)
-            const user = await login(formData.username, formData.password)
+            const trimmedUsername = formData.username.trim()
+            console.log('Attempting admin login for:', trimmedUsername)
+            const user = await login(trimmedUsername, formData.password)
 
             // Check if user has admin privileges
             if (!user.is_admin) {

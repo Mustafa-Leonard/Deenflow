@@ -5,11 +5,22 @@ import Card from '../components/Card'
 export default function DeenPlanner() {
     const [plan, setPlan] = useState(null)
     const [analytics, setAnalytics] = useState(null)
+    const [loggedPrayers, setLoggedPrayers] = useState([])
+
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         fetchData()
     }, [])
+
+    const handleLog = async (prayer) => {
+        try {
+            await api.post('/sis/log/', { category: `salah_${prayer.toLowerCase()}` })
+            setLoggedPrayers([...loggedPrayers, prayer])
+        } catch (error) {
+            console.error('Failed to log prayer:', error)
+        }
+    }
 
     const fetchData = async () => {
         try {
@@ -74,13 +85,17 @@ export default function DeenPlanner() {
                         {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map(prayer => (
                             <div key={prayer} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-brand-600 transition-colors shadow-sm font-bold">
-                                        {prayer.charAt(0)}
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors shadow-sm font-bold ${loggedPrayers.includes(prayer) ? 'bg-brand-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-400 group-hover:text-brand-600'}`}>
+                                        {loggedPrayers.includes(prayer) ? '✓' : prayer.charAt(0)}
                                     </div>
-                                    <span className="font-bold text-slate-900 dark:text-white">{prayer}</span>
+                                    <span className={`font-bold ${loggedPrayers.includes(prayer) ? 'text-brand-600' : 'text-slate-900 dark:text-white'}`}>{prayer}</span>
                                 </div>
-                                <button className="px-6 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold hover:bg-brand-600 hover:text-white hover:border-brand-600 transition-all shadow-sm">
-                                    Log Prayer
+                                <button
+                                    disabled={loggedPrayers.includes(prayer)}
+                                    onClick={() => handleLog(prayer)}
+                                    className={`px-6 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${loggedPrayers.includes(prayer) ? 'bg-brand-50 text-brand-600 border-brand-100 cursor-default' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-brand-600 hover:text-white hover:border-brand-600'}`}
+                                >
+                                    {loggedPrayers.includes(prayer) ? 'Logged' : 'Log Prayer'}
                                 </button>
                             </div>
                         ))}

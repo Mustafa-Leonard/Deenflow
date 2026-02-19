@@ -6,7 +6,7 @@ export default function SavedReflections() {
   const [list, setList] = useState([])
 
   useEffect(() => {
-    api.get('/guidance/reflections/').then(r => {
+    api.get('/answers/saved/').then(r => {
       setList(r.data)
     }).catch(e => console.error(e))
   }, [])

@@ -11,7 +11,11 @@ export default function Register() {
     e.preventDefault()
     if (form.password !== form.password2) { return alert('Passwords mismatch') }
     try {
-      const success = await register({ full_name: form.username, email: form.email, password: form.password })
+      const success = await register({
+        full_name: form.username.trim(),
+        email: form.email.trim(),
+        password: form.password
+      })
       if (success) nav('/')
       else alert('Register failed')
     } catch (e) {

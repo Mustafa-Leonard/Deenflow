@@ -1,0 +1,287 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  DeenFlow — Production Docker Compose
+#  ═══════════════════════════════════════════════════════════════════════════
+#
+#  NETWORK TOPOLOGY (private, no external exposure):
+#
+#   Internet → Nginx (reverse proxy, port 80/443)
+#                │
+#                ├─→ Django (gunicorn, port 8000)  ×3 replicas
+#                │         │                │
+#                │         ▼                ▼
+#                │      Redis         PgBouncer (port 6432)
+#                │                        │
+#                │                 ┌──────┴──────────┐
+#                │                 ▼                  ▼
+#                │         Postgres Primary     Postgres Replica
+#                │         (port 5432, private) (port 5432, private)
+#                │
+#                └─→ No direct public access to DB or PgBouncer
+#
+#  Secrets are injected via Docker Secrets, NOT environment variables in the
+#  compose file.  In a CaaS environment (ECS, GKE) replace with the
+#  platform-native secrets mechanism.
+# ═══════════════════════════════════════════════════════════════════════════
+
+version: "3.9"
+
+# ─── Networks ─────────────────────────────────────────────────────────────
+networks:
+  frontend_net:
+    # Traffic: Internet → Nginx → Django
+    driver: bridge
+
+  backend_net:
+    # Traffic: Django → Redis, Django → PgBouncer
+    # DB is NEVER connected to frontend_net
+    driver: bridge
+    internal: false # Must be false so Django workers can reach OpenAI API
+
+  db_net:
+    # Traffic: PgBouncer → Postgres Primary/Replica
+    # Completely internal — no container outside db_net can reach Postgres
+    driver: bridge
+    internal: true # ← KEY: No external routing from this network
+
+# ─── Volumes ──────────────────────────────────────────────────────────────
+volumes:
+  postgres_primary_data:
+    driver: local
+  postgres_replica_data:
+    driver: local
+  redis_data:
+    driver: local
+  static_files:
+    driver: local
+
+# ─── Secrets (read from files, never baked into the image) ────────────────
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  postgres_readonly_password:
+    file: ./secrets/postgres_readonly_password.txt
+  pgbouncer_hba:
+    file: ./secrets/pgbouncer.hba
+  django_secret_key:
+    file: ./secrets/django_secret_key.txt
+  django_env:
+    file: ./secrets/django.env # full env file loaded by Django
+  postgres_ca_cert:
+    file: ./secrets/postgres_ca.crt # CA cert for TLS verification
+
+# ═══════════════════════════════════════════════════════════════════════════
+services:
+
+  # ─── Nginx — Public Entry Point ────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - static_files:/static:ro
+    networks:
+      - frontend_net
+    depends_on:
+      - django
+    healthcheck:
+      test: [ "CMD", "nginx", "-t" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ─── Django / Gunicorn — Application Layer ─────────────────────────────
+  django:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: runtime
+    restart: always
+    deploy:
+      replicas: 3 # Horizontal scaling — add more as traffic grows
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    env_file:
+      - ./secrets/django.env
+    environment:
+      DB_HOST: pgbouncer
+      DB_PORT: "6432"
+    secrets:
+      - postgres_ca_cert
+    volumes:
+      - static_files:/app/staticfiles
+    networks:
+      - frontend_net
+      - backend_net
+    depends_on:
+      pgbouncer:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health/" ]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+  # ─── PgBouncer — Connection Pooler (Primary) ───────────────────────────
+  # Sits between Django and Postgres.
+  # Limits actual Postgres connections to max_connections (100 default).
+  # Django can open thousands of connections to PgBouncer without overloading Postgres.
+  pgbouncer:
+    image: bitnami/pgbouncer:1.22.1
+    restart: always
+    environment:
+      POSTGRESQL_HOST: postgres_primary
+      POSTGRESQL_PORT: "5432"
+      PGBOUNCER_DATABASE: deenflow_prod
+      PGBOUNCER_POOL_MODE: transaction # Transaction-level pooling for max efficiency
+      PGBOUNCER_MAX_CLIENT_CONN: "2000" # Django containers can open many connections
+      PGBOUNCER_DEFAULT_POOL_SIZE: "25" # Only 25 real server connections per DB
+      PGBOUNCER_MIN_POOL_SIZE: "5"
+      PGBOUNCER_SERVER_TLS_SSLMODE: require
+      PGBOUNCER_AUTH_TYPE: scram-sha-256
+    secrets:
+      - pgbouncer_hba
+    networks:
+      - backend_net
+      - db_net
+    depends_on:
+      postgres_primary:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h localhost -p 6432" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── PgBouncer — Connection Pooler (Replica) ───────────────────────────
+  pgbouncer_replica:
+    image: bitnami/pgbouncer:1.22.1
+    restart: always
+    environment:
+      POSTGRESQL_HOST: postgres_replica
+      POSTGRESQL_PORT: "5432"
+      PGBOUNCER_DATABASE: deenflow_prod
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: "2000"
+      PGBOUNCER_DEFAULT_POOL_SIZE: "25"
+      PGBOUNCER_MIN_POOL_SIZE: "5"
+      PGBOUNCER_SERVER_TLS_SSLMODE: require
+      PGBOUNCER_AUTH_TYPE: scram-sha-256
+    secrets:
+      - pgbouncer_hba
+    networks:
+      - backend_net
+      - db_net
+    depends_on:
+      postgres_replica:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h localhost -p 6432" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── PostgreSQL Primary ─────────────────────────────────────────────────
+  postgres_primary:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: deenflow_prod
+      POSTGRES_USER: postgres # Superuser — used ONLY for initial setup
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres_primary_data:/var/lib/postgresql/data
+      - ./postgres/primary/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./postgres/primary/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - ./postgres/init/01_roles.sql:/docker-entrypoint-initdb.d/01_roles.sql:ro
+      - ./postgres/init/02_schema.sql:/docker-entrypoint-initdb.d/02_schema.sql:ro
+    command: >
+      postgres
+        -c config_file=/etc/postgresql/postgresql.conf
+        -c hba_file=/etc/postgresql/pg_hba.conf
+    networks:
+      - db_net # ← Only reachable from db_net — NEVER from frontend_net
+    ports: [] # ← No published port — DB is completely private
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d deenflow_prod" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ─── PostgreSQL Replica (Streaming Replication) ──────────────────────────
+  postgres_replica:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      # Replica is bootstrapped from primary via pg_basebackup in the entrypoint
+      PRIMARY_HOST: postgres_primary
+      PRIMARY_PORT: "5432"
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres_replica_data:/var/lib/postgresql/data
+      - ./postgres/replica/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./postgres/replica/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - ./postgres/replica/setup_replica.sh:/docker-entrypoint-initdb.d/setup_replica.sh:ro
+    command: >
+      postgres
+        -c config_file=/etc/postgresql/postgresql.conf
+        -c hba_file=/etc/postgresql/pg_hba.conf
+    networks:
+      - db_net
+    ports: []
+    depends_on:
+      postgres_primary:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d deenflow_prod" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ─── Redis — Caching & Sessions ────────────────────────────────────────
+  redis:
+    image: redis:7.2-alpine
+    restart: always
+    command: >
+      redis-server
+        --requirepass ${REDIS_PASSWORD}
+        --maxmemory 512mb
+        --maxmemory-policy allkeys-lru
+        --save 60 1
+        --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend_net
+    ports: [] # ← No published port
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── pg_prometheus exporter — Monitoring ──────────────────────────────
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    restart: always
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres_monitor:MONITOR_PASS@postgres_primary:5432/deenflow_prod?sslmode=require"
+    networks:
+      - db_net
+    ports: [] # Scraped internally by Prometheus, not exposed publicly

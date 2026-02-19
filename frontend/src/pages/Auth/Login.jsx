@@ -3,8 +3,9 @@ import AuthContext from '../../contexts/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
 
 export default function Login() {
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(localStorage.getItem('rememberedEmail') || '')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(!!localStorage.getItem('rememberedEmail'))
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useContext(AuthContext)
@@ -15,7 +16,15 @@ export default function Login() {
     setLoading(true)
     setError('')
     try {
-      const user = await login(email, password)
+      const trimmedEmail = email.trim()
+      const user = await login(trimmedEmail, password)
+
+      if (rememberMe) {
+        localStorage.setItem('rememberedEmail', trimmedEmail)
+      } else {
+        localStorage.removeItem('rememberedEmail')
+      }
+
       if (user.is_admin) {
         nav('/admin/dashboard')
       } else {
@@ -110,6 +119,25 @@ export default function Login() {
                 required
                 className="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all text-slate-900 font-medium"
               />
+            </div>
+
+            <div className="flex items-center justify-between px-1">
+              <label className="flex items-center cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={e => setRememberMe(e.target.checked)}
+                  className="hidden"
+                />
+                <div className={`w-5 h-5 rounded-md border-2 mr-3 flex items-center justify-center transition-all ${rememberMe ? 'bg-brand-600 border-brand-600' : 'bg-slate-50 border-slate-200'}`}>
+                  {rememberMe && (
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                <span className="text-xs font-bold text-slate-500 group-hover:text-slate-700 transition-colors uppercase tracking-wider">Remember Me</span>
+              </label>
             </div>
 
             <button

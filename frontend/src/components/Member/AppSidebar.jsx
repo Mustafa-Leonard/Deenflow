@@ -123,6 +123,29 @@ export default function AppSidebar() {
                     <div>
                         <div className="flex items-center gap-2 px-4 mb-3 opacity-60">
                             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase">
+                                Growth & Support
+                            </span>
+                            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
+                        </div>
+                        <div className="space-y-1">
+                            <NavLink to="/app/upgrade" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">💎</span>
+                                <span className="font-medium tracking-wide">Upgrade to Premium</span>
+                            </NavLink>
+                            <NavLink to="/app/donations" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">🤝</span>
+                                <span className="font-medium tracking-wide">Donations & Zakat</span>
+                            </NavLink>
+                            <NavLink to="/app/consultation" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">👨‍🏫</span>
+                                <span className="font-medium tracking-wide">Consultations</span>
+                            </NavLink>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div className="flex items-center gap-2 px-4 mb-3 opacity-60">
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase">
                                 Settings
                             </span>
                             <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>

@@ -2,6 +2,7 @@ import React from 'react'
 import { Outlet, Navigate } from 'react-router-dom'
 import AppSidebar from './AppSidebar'
 import AppTopbar from './AppTopbar'
+import Footer from '../Footer'
 import AuthContext from '../../contexts/AuthContext'
 
 export default function MemberLayout() {
@@ -16,8 +17,11 @@ export default function MemberLayout() {
             <AppTopbar />
             <AppSidebar />
 
-            <main className="ml-72 pt-20 p-8 transition-all duration-300">
-                <Outlet />
+            <main className="ml-72 pt-20 transition-all duration-300">
+                <div className="p-8">
+                    <Outlet />
+                </div>
+                <Footer />
             </main>
         </div>
     )

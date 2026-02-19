@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../../api'
 
 export default function AdminDashboardPage() {
+    const navigate = useNavigate()
     const [stats, setStats] = useState({
         totalUsers: 0,
         questionsToday: 0,
@@ -37,6 +39,35 @@ export default function AdminDashboardPage() {
         }
     }
 
+    const handleDownloadReport = async () => {
+        try {
+            const response = await api.get('/auth/admin/dashboard/export/', {
+                responseType: 'blob'
+            })
+            const url = window.URL.createObjectURL(new Blob([response.data]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'deenflow-report.csv')
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+        } catch (error) {
+            console.error('Failed to download report:', error)
+            alert('Failed to generate report')
+        }
+    }
+
+    const handleSystemHealth = async () => {
+        try {
+            const res = await api.get('/auth/admin/dashboard/health/')
+            const h = res.data
+            alert(`System Status: ${h.status.toUpperCase()}\n\nDatabase: ${h.database}\nCache: ${h.cache}\nStorage: ${h.storage}\nLast Check: ${new Date(h.timestamp).toLocaleTimeString()}`)
+        } catch (error) {
+            console.error('Failed to check health:', error)
+            alert('Failed to connect to monitoring service')
+        }
+    }
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-96">
@@ -61,10 +92,16 @@ export default function AdminDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-medium shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm">
+                    <button
+                        onClick={handleDownloadReport}
+                        className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-medium shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm"
+                    >
                         Download Report
                     </button>
-                    <button className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-medium shadow-lg shadow-brand-600/20 transition-all active:scale-95 text-sm">
+                    <button
+                        onClick={handleSystemHealth}
+                        className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-medium shadow-lg shadow-brand-600/20 transition-all active:scale-95 text-sm"
+                    >
                         System Health
                     </button>
                 </div>
@@ -79,6 +116,7 @@ export default function AdminDashboardPage() {
                     trend="+12%"
                     trendUp={true}
                     color="blue"
+                    onClick={() => navigate('/admin/users')}
                 />
                 <StatsCard
                     title="Questions Today"
@@ -87,6 +125,7 @@ export default function AdminDashboardPage() {
                     trend="+5%"
                     trendUp={true}
                     color="brand"
+                    onClick={() => navigate('/admin/questions?date=today')}
                 />
                 <StatsCard
                     title="Pending Reviews"
@@ -95,6 +134,7 @@ export default function AdminDashboardPage() {
                     trend="-3%"
                     trendUp={false}
                     color="orange"
+                    onClick={() => navigate('/admin/reviews?status=pending')}
                 />
                 <StatsCard
                     title="Flagged AI Answers"
@@ -104,6 +144,7 @@ export default function AdminDashboardPage() {
                     trendUp={false}
                     alert={stats.flaggedAIAnswers > 10}
                     color="red"
+                    onClick={() => navigate('/admin/answers?flagged=true')}
                 />
             </div>
 
@@ -117,12 +158,21 @@ export default function AdminDashboardPage() {
                                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">Recent AI Interactions</h2>
                                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Live feed of user questions</p>
                             </div>
-                            <button className="text-brand-600 dark:text-brand-400 text-sm font-bold hover:underline">View All</button>
+                            <Link
+                                to="/admin/ai/logs"
+                                className="text-brand-600 dark:text-brand-400 text-sm font-bold hover:underline bg-brand-50 dark:bg-brand-900/20 px-4 py-2 rounded-xl transition-all"
+                            >
+                                View All
+                            </Link>
                         </div>
                         <div className="divide-y divide-slate-100 dark:divide-slate-800">
                             {recentActivity.length > 0 ? (
                                 recentActivity.map((activity) => (
-                                    <div key={activity.id} className="p-5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer">
+                                    <div
+                                        key={activity.id}
+                                        onClick={() => navigate(`/admin/ai/review/${activity.id}`)}
+                                        className="p-5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer"
+                                    >
                                         <div className="flex items-start gap-4">
                                             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-900/20 dark:to-brand-800/20 flex items-center justify-center flex-shrink-0 text-brand-600 dark:text-brand-400 shadow-sm border border-brand-100 dark:border-brand-800/30">
                                                 <span className="text-lg">🤖</span>
@@ -234,7 +284,7 @@ export default function AdminDashboardPage() {
     )
 }
 
-function StatsCard({ title, value, icon, trend, trendUp, alert, color }) {
+function StatsCard({ title, value, icon, trend, trendUp, alert, color, onClick }) {
     const colorStyles = {
         blue: {
             bg: 'from-blue-500/10 to-blue-600/5',
@@ -261,7 +311,10 @@ function StatsCard({ title, value, icon, trend, trendUp, alert, color }) {
     const style = colorStyles[color] || colorStyles.brand
 
     return (
-        <div className={`bg-white dark:bg-slate-900 rounded-3xl border ${alert ? 'border-red-300 dark:border-red-800 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-slate-800'} p-6 transition-all hover:shadow-xl hover:-translate-y-1 relative overflow-hidden group`}>
+        <div
+            onClick={onClick}
+            className={`bg-white dark:bg-slate-900 rounded-3xl border ${alert ? 'border-red-300 dark:border-red-800 ring-2 ring-red-500/20' : 'border-slate-200 dark:border-slate-800'} p-6 transition-all hover:shadow-xl hover:-translate-y-1 relative overflow-hidden group cursor-pointer active:scale-95`}
+        >
             {/* Background Gradient Decoration */}
             <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${style.bg} rounded-bl-full opacity-50 transition-opacity group-hover:opacity-100`}></div>
 

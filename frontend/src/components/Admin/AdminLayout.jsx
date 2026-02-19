@@ -2,6 +2,7 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import AdminSidebar from './AdminSidebar'
 import AdminTopbar from './AdminTopbar'
+import Footer from '../Footer'
 
 export default function AdminLayout() {
     return (
@@ -9,9 +10,13 @@ export default function AdminLayout() {
             <AdminTopbar />
             <AdminSidebar />
 
-            <main className="ml-72 pt-20 p-8 transition-all duration-300">
-                <Outlet />
+            <main className="ml-72 pt-20 transition-all duration-300">
+                <div className="p-8">
+                    <Outlet />
+                </div>
+                <Footer />
             </main>
         </div>
     )
 }
+

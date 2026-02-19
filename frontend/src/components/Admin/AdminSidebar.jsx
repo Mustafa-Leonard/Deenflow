@@ -22,7 +22,8 @@ export default function AdminSidebar() {
             title: 'CONTENT & MEDIA',
             items: [
                 { to: '/admin/content', icon: '📝', label: 'Content Management' },
-                { to: '/admin/reviews', icon: '✅', label: 'Reviews & Approvals' },
+                { to: '/admin/fiqh', icon: '⚖️', label: 'Fiqh Library' },
+                { to: '/admin/reviews', icon: '✅', label: 'Moderation Queue' },
                 { to: '/admin/quran', icon: '🕌', label: "Qur'an Management" }
             ]
         },
@@ -47,7 +48,7 @@ export default function AdminSidebar() {
             items: [
                 { to: '/admin/moderation', icon: '🛡️', label: 'Moderation' },
                 { to: '/admin/analytics', icon: '📈', label: 'Analytics' },
-                { to: '/admin/audit-logs', icon: '📋', label: 'Audit Trail' }
+                { to: '/admin/audit', icon: '📋', label: 'Audit Trail' }
             ]
         }
     ]
