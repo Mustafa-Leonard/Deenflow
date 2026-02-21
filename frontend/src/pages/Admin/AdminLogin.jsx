@@ -1,9 +1,10 @@
 import React, { useState, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import AuthContext from '../../contexts/AuthContext'
 
 export default function AdminLogin() {
     const navigate = useNavigate()
+    const location = useLocation()
     const { login } = useContext(AuthContext)
     const [formData, setFormData] = useState({ username: '', password: '' })
     const [loading, setLoading] = useState(false)
@@ -26,7 +27,8 @@ export default function AdminLogin() {
                 return
             }
 
-            navigate('/admin/dashboard')
+            const from = location.state?.from?.pathname || '/admin/dashboard'
+            navigate(from, { replace: true })
         } catch (err) {
             console.error('Admin login error:', err)
             const detail = err.response?.data?.detail

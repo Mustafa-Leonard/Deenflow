@@ -4,11 +4,14 @@ import api from '../api'
 const AuthContext = createContext()
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('user')
+    return saved ? JSON.parse(saved) : null
+  })
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const saved = localStorage.getItem('user')
-    if (saved) setUser(JSON.parse(saved))
+    setLoading(false)
   }, [])
 
   const login = async (email, password) => {
@@ -49,7 +52,7 @@ export function AuthProvider({ children }) {
     return resp.data
   }
 
-  return <AuthContext.Provider value={{ user, login, logout, register, updateProfile }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, loading, login, logout, register, updateProfile }}>{children}</AuthContext.Provider>
 }
 
 export default AuthContext

@@ -39,7 +39,8 @@ class DonationViewSet(viewsets.ModelViewSet):
         wallet = Wallet.objects.get(user=self.request.user)
         
         if wallet.balance < amount:
-            raise Exception("Insufficient balance")
+            from rest_framework import serializers
+            raise serializers.ValidationError({"error": "Insufficient balance in your Zakat/Sadaqah wallet."})
         
         wallet.balance -= amount
         wallet.save()

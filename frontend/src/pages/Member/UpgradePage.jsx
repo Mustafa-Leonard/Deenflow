@@ -57,13 +57,26 @@ export default function UpgradePage() {
 
         setLoading(true)
         try {
-            // In a real app, this would redirect to Stripe Checkout
-            const res = await api.post('/billing/subscribe/', { tier: tierId })
+            // Updated to correct DRF action path
+            const res = await api.post('/billing/my-subscription/subscribe/', { tier: tierId })
+
+            // If the response contains updated profile info, we should update localStorage/Context
+            const saved = localStorage.getItem('user')
+            if (saved) {
+                const userObj = JSON.parse(saved)
+                userObj.subscription = res.data.tier // Assuming the backend returns tier info
+                localStorage.setItem('user', JSON.stringify(userObj))
+                // Note: To update the UI instantly without refresh, 
+                // we'd need to use updateProfile or similar from AuthContext.
+                // For now, let's just navigate to dashboard and let it refresh or show success.
+            }
+
             if (res.data.checkoutUrl) {
                 window.location.href = res.data.checkoutUrl
             } else {
-                alert('Subscription successful! (Mock mode)')
+                alert(`BarakAllah Feek! You are now subscribed to ${tierId.toUpperCase()}. Access unlocked.`)
                 navigate('/app/dashboard')
+                window.location.reload() // Force reload to update context if not using state sync
             }
         } catch (error) {
             console.error('Upgrade failed:', error)
@@ -89,8 +102,8 @@ export default function UpgradePage() {
                     <div
                         key={tier.id}
                         className={`relative rounded-3xl p-8 flex flex-col transition-all duration-300 ${tier.popular
-                                ? 'bg-brand-900 text-white shadow-2xl shadow-brand-900/40 ring-4 ring-brand-500/20 scale-105 z-10'
-                                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white hover:border-brand-200 dark:hover:border-brand-800'
+                            ? 'bg-brand-900 text-white shadow-2xl shadow-brand-900/40 ring-4 ring-brand-500/20 scale-105 z-10'
+                            : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white hover:border-brand-200 dark:hover:border-brand-800'
                             }`}
                     >
                         {tier.popular && (
@@ -129,10 +142,10 @@ export default function UpgradePage() {
                             disabled={loading || tier.current}
                             onClick={() => handleUpgrade(tier.id)}
                             className={`w-full py-4 rounded-2xl font-bold transition-all active:scale-95 ${tier.current
-                                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-default'
-                                    : tier.popular
-                                        ? 'bg-white text-brand-900 hover:bg-brand-50 shadow-lg'
-                                        : 'bg-brand-600 text-white hover:bg-brand-700 shadow-lg'
+                                ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-default'
+                                : tier.popular
+                                    ? 'bg-white text-brand-900 hover:bg-brand-50 shadow-lg'
+                                    : 'bg-brand-600 text-white hover:bg-brand-700 shadow-lg'
                                 }`}
                         >
                             {tier.current ? 'Your Current Plan' : tier.buttonText}

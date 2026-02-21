@@ -39,8 +39,18 @@ export default function LearningPaths() {
                                     📚
                                 </div>
                             )}
-                            <div className="absolute top-4 right-4 uppercase text-[10px] font-bold bg-white/90 text-slate-900 px-3 py-1 rounded-full shadow-sm">
-                                {path.difficulty}
+                            <div className="absolute top-4 right-4 flex gap-2">
+                                {path.is_premium && (
+                                    <span className="px-3 py-1 bg-amber-500 text-brand-950 text-[10px] font-bold uppercase tracking-widest rounded-full flex items-center gap-1 shadow-lg">
+                                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" />
+                                        </svg>
+                                        Premium
+                                    </span>
+                                )}
+                                <span className="px-3 py-1 bg-white/90 text-slate-900 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
+                                    {path.difficulty}
+                                </span>
                             </div>
                         </div>
                         <div className="p-8 flex-1 flex flex-col">
@@ -52,13 +62,13 @@ export default function LearningPaths() {
                             </p>
                             <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-50 dark:border-slate-800">
                                 <div className="text-xs font-bold text-slate-400 tracking-widest uppercase">
-                                    {path.lessons_count} Lessons
+                                    {path.lessons_count} Modules
                                 </div>
                                 <button
                                     onClick={() => navigate(`/app/learning/${path.slug}`)}
                                     className="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition-all active:scale-95"
                                 >
-                                    Start Path
+                                    Explore Academy
                                 </button>
                             </div>
                         </div>

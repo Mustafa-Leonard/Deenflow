@@ -19,6 +19,17 @@ class LessonDetailView(generics.RetrieveAPIView):
     serializer_class = LessonSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_object(self):
+        obj = super().get_object()
+        if obj.path.is_premium:
+            user = self.request.user
+            # Check if user has premium subscription or is staff/admin
+            has_premium = hasattr(user, 'subscription') and user.subscription.status == 'active' and user.subscription.tier.slug in ['premium', 'pro']
+            if not (has_premium or user.is_staff or user.is_superuser):
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied("Premium subscription required to access this lesson.")
+        return obj
+
 class MarkLessonCompleteView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     

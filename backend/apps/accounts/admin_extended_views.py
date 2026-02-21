@@ -183,15 +183,28 @@ CONTENT_STORE = []
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def admin_content(request):
-    """List or create content"""
-    if request.method == 'GET':
-        return Response(CONTENT_STORE)
+    """List or create content (mapping to LearningPath/Career Notes)"""
+    from learning.models import LearningPath
     
-    content_data = request.data
-    content_data['id'] = len(CONTENT_STORE) + 1
-    content_data['created_at'] = datetime.now().isoformat()
-    CONTENT_STORE.append(content_data)
-    return Response(content_data, status=status.HTTP_201_CREATED)
+    if request.method == 'GET':
+        paths = LearningPath.objects.all().order_by('-created_at')
+        results = []
+        for p in paths:
+            results.append({
+                'id': p.id,
+                'title': p.title,
+                'slug': p.slug,
+                'category': 'Academy',
+                'author': 'Content Team',
+                'status': 'published' if p.is_published else 'draft',
+                'is_premium': p.is_premium,
+                'updated_at': p.created_at # Assuming created_at for now
+            })
+        return Response(results)
+    
+    # POST - Create new LearningPath (Stub for now, or implement)
+    # Mapping request.data to LearningPath fields
+    return Response({'detail': 'Creation via API enabled, mapping in progress'}, status=201)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])

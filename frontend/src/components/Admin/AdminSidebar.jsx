@@ -21,7 +21,7 @@ export default function AdminSidebar() {
         {
             title: 'CONTENT & MEDIA',
             items: [
-                { to: '/admin/content', icon: '📝', label: 'Content Management' },
+                { to: '/admin/content', icon: '📝', label: 'Career Notes Mgt' },
                 { to: '/admin/fiqh', icon: '⚖️', label: 'Fiqh Library' },
                 { to: '/admin/reviews', icon: '✅', label: 'Moderation Queue' },
                 { to: '/admin/quran', icon: '🕌', label: "Qur'an Management" }

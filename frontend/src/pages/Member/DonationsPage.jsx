@@ -71,7 +71,7 @@ export default function DonationsPage() {
                 <div className="relative z-10 flex flex-col sm:flex-row items-center gap-6">
                     <div className="bg-white/5 border border-white/10 p-6 rounded-[2rem] backdrop-blur-md w-full sm:w-auto text-center sm:text-left">
                         <div className="text-[10px] uppercase font-bold text-brand-300 tracking-[0.2em] mb-1">Wallet Balance</div>
-                        <div className="text-3xl font-display font-bold">${wallet?.balance?.toFixed(2)}</div>
+                        <div className="text-3xl font-display font-bold">${Number(wallet?.balance || 0).toFixed(2)}</div>
                     </div>
                     <button
                         onClick={handleDeposit}

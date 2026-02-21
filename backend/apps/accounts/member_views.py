@@ -110,6 +110,6 @@ def member_dashboard_extras(request):
         } if upcoming_session else None,
         'featuredCampaign': {
             'title': featured_campaign.title,
-            'progress': float(featured_campaign.current_amount / featured_campaign.target_amount * 100) if featured_campaign else 0
+            'progress': float((featured_campaign.current_amount / featured_campaign.target_amount) * 100) if featured_campaign and featured_campaign.target_amount > 0 else 0
         } if featured_campaign else None
     })

@@ -59,6 +59,8 @@ import ReviewPanelPage from './pages/Admin/ReviewPanelPage'
 import AuditLogPage from './pages/Admin/AuditLogPage'
 import AnalyticsPage from './pages/Admin/AnalyticsPage'
 import LearningPaths from './pages/LearningPaths'
+import LessonListPage from './pages/Member/LessonListPage'
+import LessonDetailPage from './pages/Member/LessonDetailPage'
 import TermsPage from './pages/TermsPage'
 import PrivacyPage from './pages/PrivacyPage'
 import ContactPage from './pages/ContactPage'
@@ -164,9 +166,10 @@ export default function App() {
             {/* Deen Planner */}
             <Route path="planner" element={<DeenPlanner />} />
 
-            {/* New Features */}
+            {/* Academy Features */}
             <Route path="learning" element={<LearningPaths />} />
-            <Route path="learning/:slug" element={<div className="p-8">Lesson List - Coming Soon</div>} />
+            <Route path="learning/:slug" element={<LessonListPage />} />
+            <Route path="lessons/:id" element={<LessonDetailPage />} />
 
             <Route path="donations" element={<DonationsPage />} />
             <Route path="consultation" element={<ConsultationsPage />} />

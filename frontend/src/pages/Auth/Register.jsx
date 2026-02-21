@@ -1,11 +1,12 @@
 import React, { useState, useContext } from 'react'
 import AuthContext from '../../contexts/AuthContext'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 
 export default function Register() {
   const [form, setForm] = useState({ username: '', email: '', password: '', password2: '' })
   const { register } = useContext(AuthContext)
   const nav = useNavigate()
+  const location = useLocation()
 
   const submit = async (e) => {
     e.preventDefault()
@@ -16,7 +17,10 @@ export default function Register() {
         email: form.email.trim(),
         password: form.password
       })
-      if (success) nav('/')
+      if (success) {
+        const from = location.state?.from?.pathname || '/app/dashboard'
+        nav(from, { replace: true })
+      }
       else alert('Register failed')
     } catch (e) {
       alert('Register failed: ' + (e.response?.data?.detail || e.message))

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import AuthContext from '../../contexts/AuthContext'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 
 export default function Login() {
   const [email, setEmail] = useState(localStorage.getItem('rememberedEmail') || '')
@@ -10,6 +10,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const { login } = useContext(AuthContext)
   const nav = useNavigate()
+  const location = useLocation()
 
   const submit = async (e) => {
     e.preventDefault()
@@ -25,11 +26,8 @@ export default function Login() {
         localStorage.removeItem('rememberedEmail')
       }
 
-      if (user.is_admin) {
-        nav('/admin/dashboard')
-      } else {
-        nav('/app/dashboard')
-      }
+      const from = location.state?.from?.pathname || (user.is_admin ? '/admin/dashboard' : '/app/dashboard')
+      nav(from, { replace: true })
     } catch (err) {
       console.error('Login error:', err)
       const status = err.response?.status

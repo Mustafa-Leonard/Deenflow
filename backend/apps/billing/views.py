@@ -14,11 +14,17 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def subscribe(self, request):
-        tier_id = request.data.get('tier_id')
+        tier_identifier = request.data.get('tier_id') or request.data.get('tier')
+        if not tier_identifier:
+            return Response({'error': 'tier_id or tier is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
         try:
-            tier = SubscriptionTier.objects.get(id=tier_id)
+            if str(tier_identifier).isdigit():
+                tier = SubscriptionTier.objects.get(id=tier_identifier)
+            else:
+                tier = SubscriptionTier.objects.get(slug=tier_identifier)
+                
             # Logic for Stripe would go here
-            # For now, we mock the subscription
             subscription, created = Subscription.objects.update_or_create(
                 user=request.user,
                 defaults={
@@ -27,9 +33,13 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
                     'current_period_end': timezone.now() + timezone.timedelta(days=30)
                 }
             )
-            return Response({'status': 'success', 'message': f'Subscribed to {tier.name}'})
+            return Response({
+                'status': 'success', 
+                'message': f'Subscribed to {tier.name}',
+                'tier': SubscriptionTierSerializer(tier).data
+            })
         except SubscriptionTier.DoesNotExist:
-            return Response({'error': 'Invalid tier'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': f'Invalid tier: {tier_identifier}'}, status=status.HTTP_400_BAD_REQUEST)
 
 class SubscriptionTierViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SubscriptionTier.objects.filter(is_active=True)

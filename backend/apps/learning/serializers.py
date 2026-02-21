@@ -18,11 +18,18 @@ class LessonSerializer(serializers.ModelSerializer):
         model = Lesson
         fields = ('id', 'path', 'title', 'order', 'content_markdown', 'video_url', 'duration_minutes', 'quiz')
 
+class LessonSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lesson
+        fields = ('id', 'title', 'order')
+
 class LearningPathSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
+    lessons = LessonSummarySerializer(many=True, read_only=True)
+
     class Meta:
         model = LearningPath
-        fields = ('id', 'title', 'slug', 'description', 'thumbnail', 'difficulty', 'lessons_count')
+        fields = ('id', 'title', 'slug', 'description', 'thumbnail', 'difficulty', 'lessons_count', 'is_premium', 'lessons')
     
     def get_lessons_count(self, obj):
         return obj.lessons.count()
