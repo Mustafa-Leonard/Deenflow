@@ -116,16 +116,37 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # ---------------------------------------------------------------------------
-# DATABASES — Supabase Configuration
+# DATABASES — Supabase Configuration with Local Fallback
 # ---------------------------------------------------------------------------
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
-DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
+_db_url = os.getenv("DATABASE_URL")
+if _db_url:
+    try:
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=_db_url,
+                conn_max_age=600,
+                ssl_require=True
+            )
+        }
+        # Enforce SSL for Supabase
+        DATABASES['default'].setdefault('OPTIONS', {})
+        DATABASES['default']['OPTIONS']['sslmode'] = 'require'
+    except Exception:
+        # Fallback to SQLite if URL is invalid (e.g. system noise)
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            }
+        }
+else:
+    # Local SQLite fallback for development if DATABASE_URL is missing
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 # ---------------------------------------------------------------------------
 # Database Router — simplified for single DB (Supabase)
@@ -264,7 +285,7 @@ PAYMENTS_ENABLED = os.getenv('PAYMENTS_ENABLED', 'False').lower() in ['true', '1
 # ---------------------------------------------------------------------------
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = "whitenoise.storage.compressedmanifeststaticfilestorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

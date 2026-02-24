@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: deenflow-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application --log-file -"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false          # Set this manually in Render dashboard (from Supabase)
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false          # Set to your Render URL e.g. deenflow-backend.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false          # Set to e.g. https://deenflow.vercel.app
+      - key: PAYMENTS_ENABLED
+        value: "False"
+      - key: OPENAI_API_KEY
+        sync: false          # Optional — set if AI features are needed
+      - key: LOG_LEVEL
+        value: "INFO"
+    healthCheckPath: /api/health/
+    autoDeploy: true
