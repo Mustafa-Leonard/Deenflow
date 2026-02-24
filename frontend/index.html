@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html class="no-transition">
 
 <head>
   <meta charset="utf-8" />
@@ -13,6 +13,29 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap"
     rel="stylesheet">
+
+  <!--
+    THEME FLASH PREVENTION — runs synchronously before any paint.
+    Reads the saved theme from localStorage and immediately stamps
+    the `dark` class + `color-scheme` on <html> so the browser
+    never renders the wrong palette even for a single frame.
+  -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var isDark = saved ? saved === 'dark' : prefersDark;
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.style.colorScheme = 'dark';
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.style.colorScheme = 'light';
+        }
+      } catch (e) { /* localStorage may be blocked in private mode */ }
+    })();
+  </script>
 </head>
 
 <body>
