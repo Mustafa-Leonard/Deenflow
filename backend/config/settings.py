@@ -36,7 +36,7 @@ load_dotenv(BASE_DIR / '.env', override=True)
 # ---------------------------------------------------------------------------
 # Core
 # ---------------------------------------------------------------------------
-SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-insecure-key-replace-in-prod')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'k29i(+wpepyk31b+hnfdpx&n$934%mnri4fs4yzf8(8l!i5tei')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1']
 
 
