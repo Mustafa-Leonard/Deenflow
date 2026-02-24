@@ -247,7 +247,9 @@ SIMPLE_JWT = {
 # ---------------------------------------------------------------------------
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # True in dev only
 if not DEBUG:
-    CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+    _cors_raw = os.getenv('CORS_ALLOWED_ORIGINS', '')
+    # Filter out blank entries — ''.split(',') returns [''] which fails corsheaders validation
+    CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors_raw.split(',') if o.strip()]
     CORS_ALLOW_CREDENTIALS = True
 
 # ---------------------------------------------------------------------------
