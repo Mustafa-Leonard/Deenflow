@@ -14,13 +14,14 @@ Key design decisions:
  - All security headers set for HTTPS-only deployment.
 """
 
+from dotenv import load_dotenv
+load_dotenv()
 import os
 import warnings
 from datetime import timedelta
 from pathlib import Path
 import sys
 
-from dotenv import load_dotenv
 import dj_database_url
 
 # ---------------------------------------------------------------------------
@@ -39,7 +40,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-insecure-key-replace-in-prod')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1']
 
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
+ALLOWED_HOSTS = ['*']
 
 # ---------------------------------------------------------------------------
 # Applications
@@ -92,8 +93,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-if not DEBUG:
-    MIDDLEWARE.insert(2, 'whitenoise.middleware.WhiteNoiseMiddleware')
+MIDDLEWARE.insert(MIDDLEWARE.index('django.middleware.security.SecurityMiddleware') + 1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'config.urls'
 
@@ -116,71 +116,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # ---------------------------------------------------------------------------
-# DATABASES — Primary (writes) + Replica (reads)
+# DATABASES — Supabase Configuration
 # ---------------------------------------------------------------------------
-# PgBouncer is the connection pool layer that sits between Django and Postgres.
-# Django connects to PgBouncer, not directly to Postgres.
-# sslmode=require enforces TLS for every connection.
-
-def _build_db(url_env_var: str, conn_max_age: int = 600) -> dict:
-    raw = os.environ.get(url_env_var, '').strip()
-    if not raw:
-        raise RuntimeError(
-            f"Required environment variable '{url_env_var}' is not set. "
-            "Check your .env or container secrets."
-        )
-    cfg = dj_database_url.parse(raw, conn_max_age=conn_max_age)
-    # Enforce TLS on every DB connection
-    cfg.setdefault('OPTIONS', {})
-    cfg['OPTIONS']['sslmode'] = os.getenv('DB_SSLMODE', 'require')
-    # Optionally pin server cert for mutual TLS
-    ssl_cert = os.getenv('DB_SSLROOTCERT')
-    if ssl_cert:
-        cfg['OPTIONS']['sslrootcert'] = ssl_cert
-    return cfg
-
-
-if DEBUG:
-    # Development: allow sqlite fallback so runserver just works
-    _db_url = os.getenv('DATABASE_URL', '').strip()
-    if _db_url:
-        try:
-            DATABASES = {
-                'default': dj_database_url.parse(_db_url, conn_max_age=60),
-            }
-            DATABASES['default'].setdefault('OPTIONS', {})
-            DATABASES['default']['OPTIONS']['sslmode'] = os.getenv('DB_SSLMODE', 'disable')
-        except Exception as _e:
-            warnings.warn(
-                f"DATABASE_URL is set but invalid ('{_db_url[:40]}…'): {_e}\n"
-                "Falling back to SQLite. Fix DATABASE_URL in .env to use PostgreSQL."
-            )
-            DATABASES = {
-                'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                    'NAME': BASE_DIR / 'db.sqlite3',
-                }
-            }
-    else:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
-        }
-else:
-    # Production: enforce real Postgres with TLS
-    DATABASES = {
-        'default': _build_db('DATABASE_URL'),           # Primary — WRITES
-    }
-    _replica_url = os.getenv('DATABASE_REPLICA_URL', '').strip()
-    if _replica_url:
-        DATABASES['replica'] = _build_db('DATABASE_REPLICA_URL')  # Replica — READS
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.getenv("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
+DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
 
 # ---------------------------------------------------------------------------
-# Database Router — send reads to replica, writes to primary
+# Database Router — simplified for single DB (Supabase)
 # ---------------------------------------------------------------------------
-DATABASE_ROUTERS = ['config.db_router.PrimaryReplicaRouter']
+# DATABASE_ROUTERS = ['config.db_router.PrimaryReplicaRouter']
 
 # ---------------------------------------------------------------------------
 # Connection health-check timeout (seconds)
@@ -305,13 +255,16 @@ USE_I18N = True
 USE_TZ = True
 
 # ---------------------------------------------------------------------------
+# Payment Feature Flag
+# ---------------------------------------------------------------------------
+PAYMENTS_ENABLED = os.getenv('PAYMENTS_ENABLED', 'False').lower() in ['true', '1']
+
+# ---------------------------------------------------------------------------
 # Static Files
 # ---------------------------------------------------------------------------
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-# whitenoise compressed storage in production only (requires: pip install whitenoise)
-if not DEBUG:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = "whitenoise.storage.compressedmanifeststaticfilestorage"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

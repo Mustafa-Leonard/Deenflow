@@ -48,13 +48,29 @@ def worship_analytics(request):
         'focus_area': insight.focus_area
     })
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
 def log_worship(request):
-    # Log an action: { "category": "salah_fajr" }
-    log = WorshipLog.objects.create(
-        user=request.user,
-        category=request.data.get('category'),
-        metadata=request.data.get('metadata', {})
-    )
-    return Response({'success': True, 'id': log.id})
+    """
+    POST: Log an action: { "category": "salah_fajr" }
+    GET: Return today's logged worship categories for the authenticated user.
+    """
+    if request.method == 'POST':
+        log = WorshipLog.objects.create(
+            user=request.user,
+            category=request.data.get('category'),
+            metadata=request.data.get('metadata', {})
+        )
+        return Response({'success': True, 'id': log.id})
+
+    # GET: return today's worship logs (e.g., ['Fajr','Dhuhr'])
+    from django.utils import timezone
+    today = timezone.now().date()
+    logs = WorshipLog.objects.filter(user=request.user, timestamp__date=today)
+    prayers = []
+    for l in logs:
+        if l.category and l.category.startswith('salah_'):
+            # category format: salah_fajr -> Fajr
+            pname = l.category.split('_', 1)[-1].capitalize()
+            prayers.append(pname)
+    return Response({'prayers': prayers})

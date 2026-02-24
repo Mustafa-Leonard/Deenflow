@@ -21,17 +21,13 @@ export default function AdminDashboardPage() {
 
     const fetchDashboardData = async () => {
         try {
-            const [statsRes, activityRes, reviewsRes, topicsRes] = await Promise.all([
-                api.get('/auth/admin/dashboard/stats/'),
-                api.get('/auth/admin/dashboard/recent-activity/'),
-                api.get('/auth/admin/dashboard/pending-reviews/'),
-                api.get('/auth/admin/dashboard/top-topics/')
-            ])
+            const res = await api.get('/auth/admin/dashboard/overview/')
+            const data = res.data
 
-            setStats(statsRes.data)
-            setRecentActivity(activityRes.data)
-            setPendingReviews(reviewsRes.data)
-            setTopTopics(topicsRes.data)
+            setStats(data.stats)
+            setRecentActivity(data.activity)
+            setPendingReviews(data.reviews)
+            setTopTopics(data.topics)
         } catch (error) {
             console.error('Failed to fetch dashboard data:', error)
         } finally {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import api from '../../api'
 
 const specializations = [
@@ -30,6 +31,8 @@ export default function ScholarsManagementPage() {
     const [selectedScholar, setSelectedScholar] = useState(null)
     const [search, setSearch] = useState('')
     const [filterStatus, setFilterStatus] = useState('all')
+    const [sortBy, setSortBy] = useState(null)
+    const [searchParams, setSearchParams] = useSearchParams()
 
     const [newScholar, setNewScholar] = useState({
         name: '', email: '', specializations: [], madhab: 'Not Specified', bio: ''
@@ -41,12 +44,38 @@ export default function ScholarsManagementPage() {
             .catch(() => { })
     }, [])
 
-    const filteredScholars = scholars.filter(s => {
+    // respond to `?tab=` query param
+    useEffect(() => {
+        const tab = searchParams.get('tab') || 'total'
+        if (tab === 'active') {
+            setFilterStatus('active')
+            setSortBy(null)
+        } else if (tab === 'pending_reviews') {
+            setFilterStatus('all')
+            setSortBy('pending')
+        } else if (tab === 'total_reviews') {
+            setFilterStatus('all')
+            setSortBy('reviews')
+        } else {
+            setFilterStatus('all')
+            setSortBy(null)
+        }
+    }, [searchParams])
+
+    let filteredScholars = scholars.filter(s => {
         const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
             s.email.toLowerCase().includes(search.toLowerCase())
         const matchStatus = filterStatus === 'all' || s.status === filterStatus
         return matchSearch && matchStatus
     })
+
+    if (sortBy === 'pending') {
+        filteredScholars = filteredScholars.filter(s => s.reviewsPending > 0)
+    }
+
+    if (sortBy === 'reviews') {
+        filteredScholars = filteredScholars.slice().sort((a, b) => b.reviewsCompleted - a.reviewsCompleted)
+    }
 
     const handleAddScholar = () => {
         const scholar = {
@@ -109,12 +138,18 @@ export default function ScholarsManagementPage() {
             {/* Stats Row */}
             <div className="grid grid-cols-4 gap-4">
                 {[
-                    { label: 'Total Scholars', value: scholars.length, icon: '👳', color: 'from-amber-500 to-orange-600' },
-                    { label: 'Active Now', value: scholars.filter(s => s.status === 'active').length, icon: '🟢', color: 'from-green-500 to-emerald-600' },
-                    { label: 'Total Reviews', value: scholars.reduce((acc, s) => acc + s.reviewsCompleted, 0), icon: '✅', color: 'from-blue-500 to-indigo-600' },
-                    { label: 'Pending Reviews', value: scholars.reduce((acc, s) => acc + s.reviewsPending, 0), icon: '⏳', color: 'from-purple-500 to-violet-600' },
+                    { key: 'total', label: 'Total Scholars', value: scholars.length, icon: '👳', color: 'from-amber-500 to-orange-600' },
+                    { key: 'active', label: 'Active Now', value: scholars.filter(s => s.status === 'active').length, icon: '🟢', color: 'from-green-500 to-emerald-600' },
+                    { key: 'total_reviews', label: 'Total Reviews', value: scholars.reduce((acc, s) => acc + s.reviewsCompleted, 0), icon: '✅', color: 'from-blue-500 to-indigo-600' },
+                    { key: 'pending_reviews', label: 'Pending Reviews', value: scholars.reduce((acc, s) => acc + s.reviewsPending, 0), icon: '⏳', color: 'from-purple-500 to-violet-600' },
                 ].map(stat => (
-                    <div key={stat.label} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+                    <div key={stat.key}
+                        onClick={() => setSearchParams({ tab: stat.key })}
+                        role="button"
+                        tabIndex={0}
+                        className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm cursor-pointer hover:shadow-lg transition-all"
+                        onKeyDown={(e) => { if (e.key === 'Enter') setSearchParams({ tab: stat.key }) }}
+                    >
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{stat.label}</p>
@@ -166,7 +201,7 @@ export default function ScholarsManagementPage() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                        {filteredScholars.map(scholar => (
+                            {filteredScholars.map(scholar => (
                             <tr key={scholar.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
@@ -340,47 +375,76 @@ export default function ScholarsManagementPage() {
                                 Assign a content review task to <strong>{selectedScholar.name}</strong>
                             </p>
                         </div>
-                        <div className="p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Task Type</label>
-                                <select className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white">
-                                    <option>AI Answer Review</option>
-                                    <option>Fiqh Ruling Verification</option>
-                                    <option>Content Article Review</option>
-                                    <option>Flagged Response Resolution</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Priority</label>
-                                <select className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white">
-                                    <option>Normal</option>
-                                    <option>High</option>
-                                    <option>Urgent</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Note</label>
-                                <textarea
-                                    rows={3}
-                                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white resize-y focus:ring-2 focus:ring-brand-500"
-                                    placeholder="Additional context for the scholar..."
-                                />
-                            </div>
-                        </div>
-                        <div className="p-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3">
-                            <button onClick={() => setShowAssignModal(false)} className="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => setShowAssignModal(false)}
-                                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 text-white text-sm font-semibold shadow-lg hover:shadow-brand-500/40 transition-all"
-                            >
-                                Assign Task
-                            </button>
-                        </div>
+                        <AssignTaskForm
+                            scholar={selectedScholar}
+                            onClose={() => setShowAssignModal(false)}
+                            onAssigned={(payload) => {
+                                // optimistic update: increment pending reviews for the scholar
+                                setScholars(prev => prev.map(s => s.id === selectedScholar.id ? { ...s, reviewsPending: (s.reviewsPending || 0) + 1 } : s))
+                                setShowAssignModal(false)
+                            }}
+                        />
                     </div>
                 </div>
             )}
+        </div>
+    )
+}
+
+
+function AssignTaskForm({ scholar, onClose, onAssigned }) {
+    const [taskType, setTaskType] = useState('AI Answer Review')
+    const [priority, setPriority] = useState('Normal')
+    const [note, setNote] = useState('')
+    const [loading, setLoading] = useState(false)
+
+    const handleAssign = async () => {
+        setLoading(true)
+            try {
+            await api.post(`/auth/admin/scholars/${scholar.id}/assign-task/`, {
+                task_type: taskType,
+                priority: priority,
+                note: note,
+            })
+            onAssigned && onAssigned({ scholar: scholar.id, task_type: taskType, priority, notes: note })
+        } catch (e) {
+            // show server error if available
+            const msg = e?.response?.data || e?.message || 'Failed to assign task.'
+            try { alert(typeof msg === 'string' ? msg : JSON.stringify(msg)) } catch { alert('Failed to assign task.') }
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <div>
+            <div className="p-6 space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Task Type</label>
+                    <select value={taskType} onChange={(e) => setTaskType(e.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white">
+                        <option>AI Answer Review</option>
+                        <option>Fiqh Ruling Verification</option>
+                        <option>Content Article Review</option>
+                        <option>Flagged Response Resolution</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Priority</label>
+                    <select value={priority} onChange={(e) => setPriority(e.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white">
+                        <option>Normal</option>
+                        <option>High</option>
+                        <option>Urgent</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Note</label>
+                    <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3} className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white resize-y focus:ring-2 focus:ring-brand-500" placeholder="Additional context for the scholar..." />
+                </div>
+            </div>
+            <div className="p-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3">
+                <button onClick={onClose} className="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+                <button disabled={loading} onClick={handleAssign} className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 text-white text-sm font-semibold shadow-lg hover:shadow-brand-500/40 transition-all">{loading ? 'Assigning...' : 'Assign Task'}</button>
+            </div>
         </div>
     )
 }

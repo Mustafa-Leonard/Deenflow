@@ -4,10 +4,13 @@ from fiqh.serializers import FiqhRulingSerializer
 
 class DraftAnswerSerializer(serializers.ModelSerializer):
     used_rulings_data = FiqhRulingSerializer(source='used_rulings', many=True, read_only=True)
+    question_text = serializers.CharField(source='question.text', read_only=True)
     
     class Meta:
         model = DraftAnswer
-        fields = '__all__'
+        fields = ('id', 'question', 'question_text', 'ai_text', 'used_rulings', 'used_rulings_data', 'status', 'created_at')
+
+
 
 class AnswerSourceSerializer(serializers.ModelSerializer):
     title = serializers.ReadOnlyField(source='fiqh_ruling.title')

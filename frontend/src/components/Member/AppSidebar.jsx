@@ -8,33 +8,43 @@ const memberLinkClass = ({ isActive }) =>
         ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-lg shadow-brand-500/30 translate-x-1'
         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-brand-600 dark:hover:text-brand-400 hover:translate-x-1')
 
-export default function AppSidebar() {
+export default function AppSidebar({ isOpen, setIsOpen }) {
     const { user } = useContext(AuthContext)
 
     return (
-        <aside className="w-72 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 fixed h-full flex flex-col z-50 transition-all duration-300">
+        <aside className={`fixed lg:sticky top-0 left-0 w-72 h-screen bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             {/* Branding - Fixed Top */}
-            <div className="h-20 flex items-center px-6 border-b border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50 backdrop-blur-md">
+            <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50 backdrop-blur-md">
                 <div className="flex items-center gap-2 group cursor-pointer">
                     <img
                         src="/deenflow-icon.svg"
                         alt="DeenFlow Icon"
-                        className="w-10 h-10 transition-transform group-hover:scale-105"
+                        className="w-8 h-8 lg:w-10 lg:h-10 transition-transform group-hover:scale-105"
                     />
                     <div>
                         <img
                             src="/deenflow-logo.svg"
                             alt="DeenFlow"
-                            className="h-7 w-auto"
+                            className="h-6 lg:h-7 w-auto"
                         />
                         <div className="flex items-center gap-1.5 mt-0.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
-                            <span className="text-[10px] uppercase tracking-wider text-brand-600 dark:text-brand-400 font-bold">
+                            <span className="text-[9px] lg:text-[10px] uppercase tracking-wider text-brand-600 dark:text-brand-400 font-bold">
                                 Member Portal
                             </span>
                         </div>
                     </div>
                 </div>
+
+                {/* Mobile Close Button */}
+                <button
+                    onClick={() => setIsOpen(false)}
+                    className="lg:hidden p-2 rounded-xl text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition-all"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
             {/* Scrollable Content */}
@@ -120,28 +130,30 @@ export default function AppSidebar() {
                         </div>
                     </div>
 
-                    <div>
-                        <div className="flex items-center gap-2 px-4 mb-3 opacity-60">
-                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase">
-                                Growth & Support
-                            </span>
-                            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
+                    {import.meta.env.VITE_PAYMENTS_ENABLED === 'true' && (
+                        <div>
+                            <div className="flex items-center gap-2 px-4 mb-3 opacity-60">
+                                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase">
+                                    Growth & Support
+                                </span>
+                                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
+                            </div>
+                            <div className="space-y-1">
+                                <NavLink to="/app/upgrade" className={memberLinkClass}>
+                                    <span className="text-xl transition-transform duration-300 group-hover:scale-110">💎</span>
+                                    <span className="font-medium tracking-wide">Upgrade to Premium</span>
+                                </NavLink>
+                                <NavLink to="/app/donations" className={memberLinkClass}>
+                                    <span className="text-xl transition-transform duration-300 group-hover:scale-110">🤝</span>
+                                    <span className="font-medium tracking-wide">Donations & Zakat</span>
+                                </NavLink>
+                                <NavLink to="/app/consultation" className={memberLinkClass}>
+                                    <span className="text-xl transition-transform duration-300 group-hover:scale-110">👨‍🏫</span>
+                                    <span className="font-medium tracking-wide">Consultations</span>
+                                </NavLink>
+                            </div>
                         </div>
-                        <div className="space-y-1">
-                            <NavLink to="/app/upgrade" className={memberLinkClass}>
-                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">💎</span>
-                                <span className="font-medium tracking-wide">Upgrade to Premium</span>
-                            </NavLink>
-                            <NavLink to="/app/donations" className={memberLinkClass}>
-                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">🤝</span>
-                                <span className="font-medium tracking-wide">Donations & Zakat</span>
-                            </NavLink>
-                            <NavLink to="/app/consultation" className={memberLinkClass}>
-                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">👨‍🏫</span>
-                                <span className="font-medium tracking-wide">Consultations</span>
-                            </NavLink>
-                        </div>
-                    </div>
+                    )}
 
                     <div>
                         <div className="flex items-center gap-2 px-4 mb-3 opacity-60">

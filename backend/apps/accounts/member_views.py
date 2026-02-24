@@ -22,17 +22,20 @@ def member_stats(request):
     salah_streak = Streak.objects.filter(user=user, category='Daily Prayer').first()
     salah_streak_val = salah_streak.current_count if salah_streak else 0
     
-    # Get overall consistency (mocked for now based on latest insight)
-    latest_insight = DailyInsight.objects.filter(user=user).order_by('-date').first()
-    consistency_score = latest_insight.worship_score if latest_insight else 0
+    # Calculate learning progress from actual UserProgress
+    from learning.models import UserProgress, Lesson
+    progress_count = UserProgress.objects.filter(user=user).count()
+    total_lessons = Lesson.objects.count()
+    learning_progress = (progress_count / total_lessons * 100) if total_lessons > 0 else 0
     
     return Response({
         'totalQuestions': total_questions,
         'savedItems': saved_items,
-        'learningProgress': consistency_score, # Using score as progress for now
+        'learningProgress': round(learning_progress, 1),
         'communityParticipation': 150, # Mock
         'salahStreak': salah_streak_val
     })
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -112,4 +115,90 @@ def member_dashboard_extras(request):
             'title': featured_campaign.title,
             'progress': float((featured_campaign.current_amount / featured_campaign.target_amount) * 100) if featured_campaign and featured_campaign.target_amount > 0 else 0
         } if featured_campaign else None
+    })
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def member_dashboard_overview(request):
+    """Combines all dashboard data into one optimized request to reduce latency"""
+    user = request.user
+    from answers.models import SavedAnswer
+    from spiritual_intelligence_service.models import Streak
+    from learning.models import UserProgress, Lesson
+    from quran.models import Ayah
+    from donations.models import Wallet, Campaign
+    from consultation.models import ConsultationSession
+    import random
+    
+    # 1. Stats
+    total_questions = Question.objects.filter(user=user).count()
+    saved_items = SavedAnswer.objects.filter(user=user).count()
+    salah_streak = Streak.objects.filter(user=user, category='Daily Prayer').first()
+    salah_streak_val = salah_streak.current_count if salah_streak else 0
+    progress_count = UserProgress.objects.filter(user=user).count()
+    total_lessons = Lesson.objects.count()
+    learning_progress = (progress_count / total_lessons * 100) if total_lessons > 0 else 0
+    
+    # 2. Recent Questions
+    recent_qs = Question.objects.filter(user=user).order_by('-created_at')[:5]
+    questions_list = [{
+        'id': q.id,
+        'input_text': q.text,
+        'created_at': q.created_at,
+        'status': q.status,
+        'category': 'General'
+    } for q in recent_qs]
+    
+    # 3. Daily Ayah
+    ayahs = Ayah.objects.filter(surah__number__lte=3)
+    if ayahs.exists():
+        ayah = random.choice(ayahs)
+        ayah_data = {
+            'id': ayah.id,
+            'arabic': ayah.text_arabic,
+            'translation': ayah.text_translation_en,
+            'reference': f"Surah {ayah.surah.name_english} {ayah.surah.number}:{ayah.ayah_number_in_surah}",
+            'surah_number': ayah.surah.number
+        }
+    else:
+        ayah_data = {
+            'arabic': 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+            'translation': 'In the name of Allah, the Most Gracious, the Most Merciful',
+            'reference': 'Quran 1:1',
+            'surah_number': 1
+        }
+        
+    # 4. Extras
+    wallet, _ = Wallet.objects.get_or_create(user=user)
+    upcoming_session = ConsultationSession.objects.filter(member=user, status='confirmed', scheduled_at__gte=datetime.now()).first()
+    featured_campaign = Campaign.objects.filter(is_active=True).first()
+    
+    # 5. Suggested Topics (Stateless for now)
+    topics = [
+        {'name': 'Introduction to Tafsir', 'slug': 'intro-tafsir', 'icon': '📖', 'lessons_count': 12},
+        {'name': 'Fiqh Basics', 'slug': 'fiqh-basics', 'icon': '⚖️', 'lessons_count': 8},
+        {'name': 'Aqeedah Fundamentals', 'slug': 'aqeedah-fundamentals', 'icon': '🕌', 'lessons_count': 15}
+    ]
+
+    return Response({
+        'stats': {
+            'totalQuestions': total_questions,
+            'savedItems': saved_items,
+            'learningProgress': round(learning_progress, 1),
+            'communityParticipation': 150,
+            'salahStreak': salah_streak_val
+        },
+        'questions': questions_list,
+        'ayah': ayah_data,
+        'topics': topics,
+        'extras': {
+            'walletBalance': wallet.balance,
+            'upcomingSession': {
+                'scholar': upcoming_session.scholar.user.full_name,
+                'time': upcoming_session.scheduled_at
+            } if upcoming_session else None,
+            'featuredCampaign': {
+                'title': featured_campaign.title,
+                'progress': float((featured_campaign.current_amount / featured_campaign.target_amount) * 100) if featured_campaign and featured_campaign.target_amount > 0 else 0
+            } if featured_campaign else None
+        }
     })

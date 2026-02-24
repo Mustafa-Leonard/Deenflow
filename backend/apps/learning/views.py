@@ -30,12 +30,46 @@ class LessonDetailView(generics.RetrieveAPIView):
                 raise PermissionDenied("Premium subscription required to access this lesson.")
         return obj
 
-class MarkLessonCompleteView(generics.CreateAPIView):
+from .models import LearningPath, Lesson, UserProgress, Quiz, Question
+
+class SubmitQuizView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def post(self, request, lesson_id):
+        try:
+            lesson = Lesson.objects.get(id=lesson_id)
+        except Lesson.DoesNotExist:
+            return Response({'error': 'Lesson not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        answers = request.data.get('answers', {})
+        score = 0.0
+        
+        # If the lesson has a quiz, calculate the score
+        if hasattr(lesson, 'quiz'):
+            quiz = lesson.quiz
+            questions = quiz.questions.all()
+            total_questions = questions.count()
+            
+            if total_questions > 0:
+                correct_count = 0
+                for q in questions:
+                    selected_option = answers.get(str(q.id))
+                    if selected_option is not None and int(selected_option) == q.correct_option_index:
+                        correct_count += 1
+                score = (correct_count / total_questions) * 100
+            else:
+                score = 100.0 # No questions means automatic pass
+        else:
+            score = 100.0 # No quiz means automatic pass when marking complete
+            
         UserProgress.objects.update_or_create(
             user=request.user,
-            lesson_id=lesson_id
+            lesson=lesson,
+            defaults={'score': score}
         )
-        return Response({'success': True})
+        
+        return Response({
+            'success': True,
+            'score': score
+        })
+

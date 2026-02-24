@@ -258,3 +258,59 @@ def admin_system_health(request):
         'storage': 'online',
         'timestamp': datetime.now().isoformat()
     })
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def admin_dashboard_overview(request):
+    """Combines all admin dashboard data into one optimized request"""
+    today = datetime.now().date()
+    
+    # 1. Stats
+    total_users = User.objects.count()
+    questions_today = Question.objects.filter(created_at__date=today).count()
+    pending_reviews_count = DraftAnswer.objects.filter(status='draft').count()
+    flagged_ai_answers_count = Flag.objects.filter(status='active').count()
+    
+    # 2. Recent Activity
+    recent_questions = Question.objects.all().order_by('-created_at')[:10]
+    activity = []
+    for q in recent_questions:
+        activity.append({
+            'id': q.id,
+            'question': q.text[:100],
+            'user': q.user.email if q.user else 'Anonymous',
+            'timestamp': q.created_at.strftime('%Y-%m-%d %H:%M'),
+            'status': q.status,
+            'flagged': q.status == 'flagged'
+        })
+        
+    # 3. Pending Reviews
+    pending = DraftAnswer.objects.filter(status='draft').order_by('-created_at')[:10]
+    reviews_list = []
+    for item in pending:
+        reviews_list.append({
+            'id': item.id,
+            'title': item.question.text[:50] + '...',
+            'author': item.question.user.email if item.question.user else 'Anonymous',
+            'date': item.created_at.strftime('%Y-%m-%d')
+        })
+        
+    # 4. Top Topics
+    topics = [
+        {'name': 'Finance & Riba', 'count': 452},
+        {'name': 'Family Law', 'count': 312},
+        {'name': 'Prayer (Salah)', 'count': 228},
+        {'name': 'Fasting Rules', 'count': 184},
+        {'name': 'Inheritance', 'count': 124},
+    ]
+
+    return Response({
+        'stats': {
+            'totalUsers': total_users,
+            'questionsToday': questions_today,
+            'pendingReviews': pending_reviews_count,
+            'flaggedAIAnswers': flagged_ai_answers_count
+        },
+        'activity': activity,
+        'reviews': reviews_list,
+        'topics': topics
+    })

@@ -9,6 +9,13 @@ class WalletViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = WalletSerializer
 
+    def initial(self, request, *args, **kwargs):
+        from django.conf import settings
+        if not getattr(settings, 'PAYMENTS_ENABLED', False):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Payments are currently disabled.")
+        return super().initial(request, *args, **kwargs)
+
     def get_queryset(self):
         return Wallet.objects.filter(user=self.request.user)
 
@@ -28,6 +35,13 @@ class CampaignViewSet(viewsets.ReadOnlyModelViewSet):
 class DonationViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = DonationSerializer
+
+    def initial(self, request, *args, **kwargs):
+        from django.conf import settings
+        if not getattr(settings, 'PAYMENTS_ENABLED', False):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Payments are currently disabled.")
+        return super().initial(request, *args, **kwargs)
 
     def get_queryset(self):
         return Donation.objects.filter(user=self.request.user)

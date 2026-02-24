@@ -6,6 +6,12 @@ export default function UpgradePage() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
 
+    React.useEffect(() => {
+        if (import.meta.env.VITE_PAYMENTS_ENABLED !== 'true') {
+            navigate('/app/dashboard')
+        }
+    }, [navigate])
+
     const tiers = [
         {
             id: 'free',

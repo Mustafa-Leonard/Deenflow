@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import AuthContext from '../../contexts/AuthContext'
 import { ThemeContext } from '../../contexts/ThemeContext'
 
-export default function AdminTopbar() {
+export default function AdminTopbar({ setIsOpen }) {
     const navigate = useNavigate()
     const { user, logout } = useContext(AuthContext)
     const { theme, toggleTheme } = useContext(ThemeContext)
@@ -43,8 +43,17 @@ export default function AdminTopbar() {
 
     return (
         <>
-            <header className="fixed top-0 right-0 left-72 h-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-40 transition-all duration-300">
-                <div className="h-full px-8 flex items-center justify-between">
+            <header className="fixed top-0 right-0 left-0 lg:left-0 h-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-40 transition-all duration-300">
+                <div className="h-full px-4 sm:px-8 flex items-center justify-between gap-4">
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        onClick={() => setIsOpen(true)}
+                        className="lg:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-930 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 transition-all active:scale-95 flex-shrink-0"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
                     {/* Global Command/Search */}
                     <div className="flex-1 max-w-2xl">
                         <div className="relative group">

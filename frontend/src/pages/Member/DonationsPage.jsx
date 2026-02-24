@@ -6,6 +6,12 @@ export default function DonationsPage() {
     const [campaigns, setCampaigns] = useState([])
     const [wallet, setWallet] = useState(null)
     const [loading, setLoading] = useState(true)
+
+    React.useEffect(() => {
+        if (import.meta.env.VITE_PAYMENTS_ENABLED !== 'true') {
+            window.location.href = '/app/dashboard'
+        }
+    }, [])
     const [donationAmount, setDonationAmount] = useState('')
     const [selectedCampaign, setSelectedCampaign] = useState(null)
 

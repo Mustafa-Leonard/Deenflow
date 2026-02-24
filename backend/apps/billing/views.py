@@ -9,6 +9,13 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = SubscriptionSerializer
 
+    def initial(self, request, *args, **kwargs):
+        from django.conf import settings
+        if not getattr(settings, 'PAYMENTS_ENABLED', False):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Payments are currently disabled.")
+        return super().initial(request, *args, **kwargs)
+
     def get_queryset(self):
         return Subscription.objects.filter(user=self.request.user)
 

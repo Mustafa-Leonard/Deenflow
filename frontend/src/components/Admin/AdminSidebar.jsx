@@ -8,7 +8,7 @@ const adminLinkClass = ({ isActive }) =>
         ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-lg shadow-brand-500/30 translate-x-1'
         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-brand-600 dark:hover:text-brand-400 hover:translate-x-1')
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ isOpen, setIsOpen }) {
     const { user } = useContext(AuthContext)
 
     const menuSections = [
@@ -54,26 +54,36 @@ export default function AdminSidebar() {
     ]
 
     return (
-        <aside className="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 fixed h-full overflow-hidden flex flex-col transition-colors duration-300 z-50">
+        <aside className={`fixed lg:sticky top-0 left-0 w-72 h-screen bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             {/* Branding - Fixed Top */}
-            <div className="h-20 flex items-center px-6 border-b border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+            <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm">
                 <div className="flex items-center gap-2 group cursor-pointer">
                     <img
                         src="/deenflow-icon.svg"
                         alt="DeenFlow Icon"
-                        className="w-10 h-10 transition-transform group-hover:scale-105 flex-shrink-0"
+                        className="w-8 h-8 lg:w-10 lg:h-10 transition-transform group-hover:scale-105 flex-shrink-0"
                     />
                     <div>
                         <img
                             src="/deenflow-logo.svg"
                             alt="DeenFlow"
-                            className="h-7 w-auto"
+                            className="h-6 lg:h-7 w-auto"
                         />
-                        <div className="text-[10px] uppercase tracking-wider text-brand-600 dark:text-brand-400 font-semibold mt-0.5">
+                        <div className="text-[9px] lg:text-[10px] uppercase tracking-wider text-brand-600 dark:text-brand-400 font-bold mt-0.5">
                             Admin Portal
                         </div>
                     </div>
                 </div>
+
+                {/* Mobile Close Button */}
+                <button
+                    onClick={() => setIsOpen(false)}
+                    className="lg:hidden p-2 rounded-xl text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition-all"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
             {/* Scrollable Navigation */}

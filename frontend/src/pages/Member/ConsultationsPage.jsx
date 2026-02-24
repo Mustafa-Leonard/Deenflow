@@ -6,6 +6,12 @@ export default function ConsultationsPage() {
     const [scholars, setScholars] = useState([])
     const [sessions, setSessions] = useState([])
     const [loading, setLoading] = useState(true)
+
+    React.useEffect(() => {
+        if (import.meta.env.VITE_PAYMENTS_ENABLED !== 'true') {
+            window.location.href = '/app/dashboard'
+        }
+    }, [])
     const [selectedScholar, setSelectedScholar] = useState(null)
     const [showBooking, setShowBooking] = useState(false)
     const [bookingData, setBookingData] = useState({

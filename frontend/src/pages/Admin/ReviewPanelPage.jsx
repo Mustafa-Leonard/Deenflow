@@ -26,7 +26,7 @@ export default function ReviewPanelPage() {
 
     const fetchDraft = async () => {
         try {
-            const res = await api.get(`/guidance/drafts/${id}/`)
+            const res = await api.get(`/answers/drafts/${id}/`)
             setDraft(res.data)
         } catch (err) {
             alert('Draft not found')
@@ -49,7 +49,7 @@ export default function ReviewPanelPage() {
         }
         setSubmitting(true)
         try {
-            await api.post(`/guidance/drafts/${id}/approve/`, { checklist, notes })
+            await api.post(`/answers/drafts/${id}/approve/`, { checklist, notes })
             navigate('/admin/reviews')
         } catch (err) {
             alert('Approval failed')
@@ -145,8 +145,8 @@ export default function ReviewPanelPage() {
                                 onClick={handleApprove}
                                 disabled={!isChecklistComplete || submitting}
                                 className={`w-full py-4 rounded-2xl font-bold text-white shadow-xl transition-all active:scale-95 ${isChecklistComplete
-                                        ? 'bg-green-600 shadow-green-500/20 hover:bg-green-700'
-                                        : 'bg-slate-300 cursor-not-allowed opacity-50'
+                                    ? 'bg-green-600 shadow-green-500/20 hover:bg-green-700'
+                                    : 'bg-slate-300 cursor-not-allowed opacity-50'
                                     }`}
                             >
                                 {submitting ? 'Approvng...' : 'Complete & Approve'}

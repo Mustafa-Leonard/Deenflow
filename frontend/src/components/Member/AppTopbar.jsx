@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import AuthContext from '../../contexts/AuthContext'
 import { ThemeContext } from '../../contexts/ThemeContext'
 
-export default function AppTopbar() {
+export default function AppTopbar({ setIsOpen }) {
     const navigate = useNavigate()
     const { user, logout } = useContext(AuthContext)
     const { theme, toggleTheme } = useContext(ThemeContext)
@@ -26,16 +26,26 @@ export default function AppTopbar() {
     const unreadCount = notifications.filter(n => n.unread).length
 
     return (
-        <header className="fixed top-0 right-0 left-72 h-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-40 transition-all duration-300">
-            <div className="h-full px-8 flex items-center justify-between max-w-7xl mx-auto w-full">
+        <header className="fixed top-0 right-0 left-0 lg:left-72 h-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-40 transition-all duration-300">
+            <div className="h-full px-4 sm:px-8 flex items-center justify-between max-w-7xl mx-auto w-full gap-4">
+
+                {/* Mobile Menu Toggle */}
+                <button
+                    onClick={() => setIsOpen(true)}
+                    className="lg:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 transition-all active:scale-95 flex-shrink-0"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
 
                 {/* Search Bar */}
-                <div className="flex-1 max-w-xl">
+                <div className="flex-1 max-w-xl md:block">
                     <div className="relative group">
                         <div className="absolute inset-0 bg-brand-500/20 rounded-2xl blur opacity-0 group-focus-within:opacity-100 transition-opacity duration-500"></div>
                         <div className="relative flex items-center">
                             <div className="absolute left-4 text-slate-400 group-focus-within:text-brand-500 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
@@ -43,10 +53,10 @@ export default function AppTopbar() {
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search questions, lessons, or topics..."
-                                className="w-full bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl pl-12 pr-4 py-3 outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-brand-500/50 dark:focus:border-brand-500/50 transition-all text-sm text-slate-900 dark:text-white placeholder-slate-400 shadow-sm"
+                                placeholder="Search..."
+                                className="w-full bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-brand-500/50 dark:focus:border-brand-500/50 transition-all text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 shadow-sm"
                             />
-                            <div className="absolute right-3 hidden md:flex items-center gap-1">
+                            <div className="absolute right-3 hidden xl:flex items-center gap-1">
                                 <span className="text-[10px] font-bold text-slate-400 bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">⌘K</span>
                             </div>
                         </div>
@@ -207,8 +217,8 @@ function MenuLink({ icon, label, onClick, highlight }) {
         <button
             onClick={onClick}
             className={`w-full text-left px-4 py-3 rounded-xl transition-all text-sm font-bold flex items-center gap-3 group ${highlight
-                    ? 'bg-brand-50 text-brand-700 hover:bg-brand-100 dark:bg-brand-900/20 dark:text-brand-300'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-brand-50 text-brand-700 hover:bg-brand-100 dark:bg-brand-900/20 dark:text-brand-300'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                 }`}
         >
             <span className="text-lg group-hover:scale-110 transition-transform">{icon}</span>

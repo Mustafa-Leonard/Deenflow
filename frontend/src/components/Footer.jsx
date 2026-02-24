@@ -49,12 +49,20 @@ export default function Footer() {
           {/* Brand & Mission */}
           <div className="lg:col-span-4 space-y-8">
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 group-hover:border-brand-500/50 transition-all duration-500 group-hover:rotate-6 shadow-2xl">
-                <img src="/deenflow-icon.svg" alt="" className="w-7 h-7" />
-              </div>
+              <img
+                src="/deenflow-icon.svg"
+                alt="DeenFlow Icon"
+                className="w-10 h-10 lg:w-12 lg:h-12 transition-transform group-hover:scale-105 flex-shrink-0"
+              />
               <div>
-                <h2 className="text-2xl font-display font-bold text-white tracking-tight">Deen<span className="text-brand-500">Flow</span></h2>
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Spiritual Intelligence</div>
+                <img
+                  src="/deenflow-logo.svg"
+                  alt="DeenFlow"
+                  className="h-7 lg:h-8 w-auto brightness-0 invert"
+                />
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] mt-1">
+                  Spiritual Intelligence
+                </div>
               </div>
             </Link>
 
@@ -95,11 +103,16 @@ export default function Footer() {
             <div className="space-y-6">
               <h4 className="text-xs font-bold text-white uppercase tracking-[0.2em]">Knowledge</h4>
               <ul className="space-y-4">
-                {['Library', 'Scholars', 'Research', 'Community'].map(item => (
-                  <li key={item}>
-                    <Link to="#" className="group flex items-center gap-2 text-sm hover:text-white transition-colors">
+                {[
+                  { label: 'Library', to: user?.is_admin ? '/admin/fiqh' : '/app/learning' },
+                  { label: 'Scholars', to: user?.is_admin ? '/admin/scholars' : '/app/consultation' },
+                  { label: 'Research', to: user?.is_admin ? '/admin/ai/logs' : '/app/my-questions' },
+                  { label: 'Community', to: user?.is_admin ? '/admin/moderation' : '/app/community' }
+                ].map(item => (
+                  <li key={item.label}>
+                    <Link to={item.to} className="group flex items-center gap-2 text-sm hover:text-white transition-colors">
                       <span className="opacity-0 group-hover:opacity-100 transition-opacity text-emerald-500">▹</span>
-                      {item}
+                      {item.label}
                     </Link>
                   </li>
                 ))}

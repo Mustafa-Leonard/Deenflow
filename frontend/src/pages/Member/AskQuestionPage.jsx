@@ -17,7 +17,12 @@ export default function AskQuestionPage() {
             alert('Question submitted for scholarly review.')
             navigate('/app/my-questions')
         } catch (err) {
-            alert('Failed to submit question.')
+            const serverMsg = err?.response?.data || err?.message || 'Failed to submit question.'
+            try {
+                alert(typeof serverMsg === 'string' ? serverMsg : JSON.stringify(serverMsg))
+            } catch (e) {
+                alert('Failed to submit question.')
+            }
         } finally {
             setSubmitting(false)
         }

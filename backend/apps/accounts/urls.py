@@ -3,7 +3,7 @@ from .views import RegisterView, profile_view
 from .admin_views import (
     admin_users_list, admin_user_detail, admin_dashboard_stats, admin_recent_activity, admin_ai_logs,
     admin_pending_reviews, admin_top_topics, admin_ai_log_detail, admin_ai_log_action,
-    admin_dashboard_export, admin_system_health
+    admin_dashboard_export, admin_system_health, admin_dashboard_overview
 )
 from .admin_extended_views import (
     admin_ai_config,
@@ -18,7 +18,7 @@ from .admin_extended_views import (
     newsletter_subscribe, contact_message,
 )
 
-from .member_views import member_stats, daily_ayah, suggested_topics, member_recent_questions, member_dashboard_extras
+from .member_views import member_stats, daily_ayah, suggested_topics, member_recent_questions, member_dashboard_extras, member_dashboard_overview
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -34,6 +34,7 @@ urlpatterns = [
     path('admin/dashboard/top-topics/', admin_top_topics, name='admin_top_topics'),
     path('admin/dashboard/export/', admin_dashboard_export, name='admin_dashboard_export'),
     path('admin/dashboard/health/', admin_system_health, name='admin_system_health'),
+    path('admin/dashboard/overview/', admin_dashboard_overview, name='admin_dashboard_overview'),
     
     # Admin endpoints - Users
     path('admin/users/', admin_users_list, name='admin_users'),
@@ -88,6 +89,7 @@ urlpatterns = [
     path('member/daily-ayah/', daily_ayah, name='daily_ayah'),
     path('member/suggested-topics/', suggested_topics, name='suggested_topics'),
     path('member/extras/', member_dashboard_extras, name='member_extras'),
+    path('member/dashboard-overview/', member_dashboard_overview, name='dashboard_overview'),
     
     # Public Utility
     path('newsletter/subscribe/', newsletter_subscribe, name='newsletter_subscribe'),

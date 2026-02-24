@@ -1,0 +1,1 @@
+import{j as t}from"./index-CD86QMyp.js";function e({children:r,className:o="",onClick:s}){return t.jsx("div",{onClick:s,className:`bg-white dark:bg-slate-900 rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300 ${o}`,children:r})}export{e as C};

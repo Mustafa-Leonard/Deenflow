@@ -87,9 +87,10 @@ export default function FiqhLibraryPage() {
                 </div>
             </div>
 
-            {/* Table */}
+            {/* Table / Cards List */}
             <div className="bg-white dark:bg-slate-950 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xl">
-                <div className="overflow-x-auto">
+                {/* Desktop View */}
+                <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
                             <tr>
@@ -122,8 +123,8 @@ export default function FiqhLibraryPage() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${r.verification_status === 'verified' ? 'bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400' :
-                                                    r.verification_status === 'draft' ? 'bg-orange-100 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400' :
-                                                        'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                                                r.verification_status === 'draft' ? 'bg-orange-100 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400' :
+                                                    'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
                                                 }`}>
                                                 {r.verification_status}
                                             </span>
@@ -137,6 +138,39 @@ export default function FiqhLibraryPage() {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile View */}
+                <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+                    {loading ? (
+                        <div className="p-12 text-center text-slate-400">Loading library...</div>
+                    ) : rulings.length === 0 ? (
+                        <div className="p-12 text-center text-slate-400">No rulings found.</div>
+                    ) : (
+                        rulings.map(r => (
+                            <div key={r.id} className="p-6 space-y-4">
+                                <div>
+                                    <div className="font-bold text-slate-900 dark:text-white mb-1">{r.title}</div>
+                                    <div className="text-xs text-slate-500 line-clamp-2">{r.description}</div>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <span className="px-2 py-0.5 bg-brand-50 dark:bg-brand-900/20 text-brand-600 text-[10px] font-bold rounded uppercase">
+                                        {r.topic}
+                                    </span>
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${r.verification_status === 'verified' ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-500'}`}>
+                                        {r.verification_status}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between pt-2">
+                                    <div className="text-[10px] text-slate-400 italic">By {r.scholar_name}</div>
+                                    <div className="flex gap-4">
+                                        <button onClick={() => navigate(`/admin/fiqh/edit/${r.id}`)} className="text-brand-600 font-bold text-[10px] uppercase">Edit</button>
+                                        <button onClick={() => deleteRuling(r.id)} className="text-red-500 font-bold text-[10px] uppercase">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </div>

@@ -14,7 +14,7 @@ export default function ModerationQueuePage() {
     const fetchQueue = async () => {
         setLoading(true)
         try {
-            const response = await api.get('/guidance/drafts/', { params: { status: 'draft' } })
+            const response = await api.get('/answers/drafts/', { params: { status: 'draft' } })
             setDrafts(response.data)
         } catch (error) {
             console.error('Failed to fetch queue:', error)

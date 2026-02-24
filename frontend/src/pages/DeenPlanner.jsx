@@ -24,12 +24,15 @@ export default function DeenPlanner() {
 
     const fetchData = async () => {
         try {
-            const [pResp, aResp] = await Promise.all([
+            const [pResp, aResp, lResp] = await Promise.all([
                 api.get('/sis/plan/'),
-                api.get('/sis/analytics/summary/')
+                api.get('/sis/analytics/summary/'),
+                api.get('/sis/log/')
             ])
             setPlan(pResp.data)
             setAnalytics(aResp.data)
+            // API returns { prayers: ['Fajr', ...] }
+            setLoggedPrayers(lResp.data.prayers || [])
         } catch (e) {
             console.error(e)
         } finally {

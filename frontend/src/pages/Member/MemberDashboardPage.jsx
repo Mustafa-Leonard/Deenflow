@@ -24,19 +24,14 @@ export default function MemberDashboardPage() {
 
     const fetchDashboardData = async () => {
         try {
-            const [statsRes, questionsRes, topicsRes, ayahRes, extrasRes] = await Promise.all([
-                api.get('/auth/member/stats/'),
-                api.get('/auth/member/recent/'),
-                api.get('/auth/member/suggested-topics/'),
-                api.get('/auth/member/daily-ayah/'),
-                api.get('/auth/member/extras/')
-            ])
+            const res = await api.get('/auth/member/dashboard-overview/')
+            const data = res.data
 
-            setStats(statsRes.data)
-            setRecentQuestions(questionsRes.data)
-            setSuggestedTopics(topicsRes.data)
-            setDailyAyah(ayahRes.data)
-            setExtras(extrasRes.data)
+            setStats(data.stats)
+            setRecentQuestions(data.questions)
+            setSuggestedTopics(data.topics)
+            setDailyAyah(data.ayah)
+            setExtras(data.extras)
         } catch (error) {
             console.error('Failed to fetch dashboard data:', error)
         } finally {
@@ -320,7 +315,7 @@ export default function MemberDashboardPage() {
                         </div>
                     </div>
                     {/* Social Impact Card */}
-                    {extras && (
+                    {import.meta.env.VITE_PAYMENTS_ENABLED === 'true' && extras && (
                         <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
                             <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                                 <h3 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-sm">Social Impact</h3>

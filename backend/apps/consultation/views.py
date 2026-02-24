@@ -12,6 +12,14 @@ class ConsultationSessionViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ConsultationSessionSerializer
 
+    def initial(self, request, *args, **kwargs):
+        from django.conf import settings
+        if not getattr(settings, 'PAYMENTS_ENABLED', False):
+            if request.method == 'POST':
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied("Booking consultations is currently disabled.")
+        return super().initial(request, *args, **kwargs)
+
     def get_queryset(self):
         user = self.request.user
         if hasattr(user, 'scholar_profile'):

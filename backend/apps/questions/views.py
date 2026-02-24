@@ -15,6 +15,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
         return Question.objects.filter(user=user).order_by('-created_at')
 
     def perform_create(self, serializer):
-        question = serializer.save(user=self.request.user)
+        question = serializer.save()
         # Trigger async pipeline
         process_new_question_task.delay(question.id)

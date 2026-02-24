@@ -167,9 +167,10 @@ export default function UsersListPage() {
                 </div>
             </div>
 
-            {/* User List Table */}
+            {/* User List - Responsive Table/Cards */}
             <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-none overflow-hidden">
-                <div className="overflow-x-auto">
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
@@ -221,7 +222,7 @@ export default function UsersListPage() {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6 text-right">
-                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                            <div className="flex items-center justify-end gap-2 md:opacity-0 group-hover:opacity-100 transition-all duration-300">
                                                 <button onClick={() => openModal(u)} className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-xl transition-all" title="Edit">
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                                 </button>
@@ -242,6 +243,74 @@ export default function UsersListPage() {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+                    {loading ? (
+                        Array.from({ length: 3 }).map((_, i) => (
+                            <div key={i} className="p-6 animate-pulse space-y-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl"></div>
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded w-1/2"></div>
+                                        <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded w-1/3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : filteredUsers.length > 0 ? (
+                        filteredUsers.map((u) => (
+                            <div key={u.id} className="p-6 space-y-4">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg ${u.is_admin ? 'bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400' : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                                            {(u.full_name || u.username).charAt(0)}
+                                        </div>
+                                        <div>
+                                            <div className="font-bold text-slate-900 dark:text-white capitalize truncate max-w-[150px]">
+                                                {u.full_name || u.username}
+                                            </div>
+                                            <div className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[150px]">
+                                                {u.email}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <button onClick={() => openModal(u)} className="p-2 text-slate-400 hover:text-brand-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                        </button>
+                                        <button onClick={() => handleDelete(u)} className="p-2 text-slate-400 hover:text-red-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50 dark:border-slate-800">
+                                    <div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Role & School</div>
+                                        {getRoleBadge(u.role)}
+                                        <div className="text-[10px] font-medium text-slate-500 mt-1">
+                                            {MADHHABS.find(m => m.value === u.madhhab)?.label || 'Hanafi'}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</div>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`w-2 h-2 rounded-full ${u.is_active !== false ? 'bg-green-500' : 'bg-slate-300'}`}></span>
+                                            <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase">
+                                                {u.is_active !== false ? 'Active' : 'Suspended'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="p-12 text-center">
+                            <div className="text-4xl mb-4 grayscale opacity-20">👥</div>
+                            <h3 className="font-bold text-slate-900 dark:text-white">No matches found</h3>
+                        </div>
+                    )}
                 </div>
             </div>
 
