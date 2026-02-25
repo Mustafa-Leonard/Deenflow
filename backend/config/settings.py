@@ -120,6 +120,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # ---------------------------------------------------------------------------
 _db_url = os.getenv("DATABASE_URL")
 if _db_url:
+    print("DEBUG: DATABASE_URL found in environment.")
     try:
         DATABASES = {
             'default': dj_database_url.config(
@@ -131,7 +132,8 @@ if _db_url:
         # Enforce SSL for Supabase
         DATABASES['default'].setdefault('OPTIONS', {})
         DATABASES['default']['OPTIONS']['sslmode'] = 'require'
-    except Exception:
+    except Exception as e:
+        print(f"DEBUG: Error parsing DATABASE_URL: {e}")
         # Fallback to SQLite if URL is invalid (e.g. system noise)
         DATABASES = {
             'default': {
@@ -140,6 +142,7 @@ if _db_url:
             }
         }
 else:
+    print("DEBUG: DATABASE_URL NOT FOUND. Falling back to SQLite.")
     # Local SQLite fallback for development if DATABASE_URL is missing
     DATABASES = {
         'default': {
