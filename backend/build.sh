@@ -5,4 +5,4 @@ set -o errexit
 pip install -r requirements.txt
 
 python manage.py collectstatic --noinput
-python manage.py migrate
+# Migrations moved to start.sh via auto_setup.py
