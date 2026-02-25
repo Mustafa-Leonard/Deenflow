@@ -45,6 +45,14 @@ def run_setup():
             logger.warning("This means your data will be WIPED every time the server restarts.")
     except Exception as e:
         logger.error(f"Database connection failed: {e}")
+        if "Network is unreachable" in str(e) or "2a05" in str(e):
+            logger.error("-" * 60)
+            logger.error("SUPABASE CONNECTION ERROR DETECTED (IPv6 Issue)")
+            logger.error("Render's network often fails to connect to Supabase's direct URL.")
+            logger.error("FIX: Go to Supabase Project Settings -> Database.")
+            logger.error("Change your Connection String to 'Transaction Pooler' (Port 6543).")
+            logger.error("Update Render DATABASE_URL with that new string.")
+            logger.error("-" * 60)
         
     # 3. Run migrations
     try:
