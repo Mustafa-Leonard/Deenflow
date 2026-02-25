@@ -4,7 +4,11 @@ import sys
 import logging
 
 # Set up logging to stdout
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
 logger = logging.getLogger(__name__)
 
 # Set up Django environment
@@ -13,75 +17,78 @@ sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR, 'apps'))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
-try:
-    django.setup()
-    from django.contrib.auth import get_user_model
-    from django.core.management import call_command
-    from django.db import connection
-except Exception as e:
-    logger.error(f"Critical error during Django setup: {e}")
-    sys.exit(1)
-
 def run_setup():
-    logger.info("Starting DeenFlow Auto-Setup Script...")
+    logger.info("="*40)
+    logger.info("DEENFLOW AUTO-SETUP STARTING")
+    logger.info("="*40)
     
-    # 1. Check Database Environment
+    # 1. Check Environment Variables
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
-        logger.error("CRITICAL: DATABASE_URL environment variable is MISSING or EMPTY!")
-        logger.info("Please go to Render Dashboard -> Environment and add DATABASE_URL.")
+        logger.error("ERROR: DATABASE_URL is MISSING! The app will fail to reach the database.")
+        logger.info("Please add DATABASE_URL to your Render Environment Variables.")
     else:
-        logger.info(f"DATABASE_URL is present (Type: {db_url.split(':')[0]})")
+        # Mask password for safety in logs
+        safe_url = db_url.split('@')[-1] if '@' in db_url else "Hidden"
+        logger.info(f"DATABASE_URL detected. Target: {safe_url}")
 
-    # 2. Check Database Connection
+    # 2. Django Setup
     try:
-        logger.info("Checking database connection...")
-        connection.ensure_connection()
-        db_engine = connection.vendor
-        logger.info(f"Connected to database engine: {db_engine}")
-        
-        if db_engine == 'sqlite':
-            logger.warning("WARNING: You are connected to SQLITE instead of POSTGRESQL!")
-            logger.warning("This means your data will be WIPED every time the server restarts.")
+        django.setup()
+        from django.db import connection
+        from django.contrib.auth import get_user_model
+        from django.core.management import call_command
     except Exception as e:
-        logger.error(f"Database connection failed: {e}")
-        if "Network is unreachable" in str(e) or "2a05" in str(e):
-            logger.error("-" * 60)
-            logger.error("SUPABASE CONNECTION ERROR DETECTED (IPv6 Issue)")
-            logger.error("Render's network often fails to connect to Supabase's direct URL.")
-            logger.error("FIX: Go to Supabase Project Settings -> Database.")
-            logger.error("Change your Connection String to 'Transaction Pooler' (Port 6543).")
-            logger.error("Update Render DATABASE_URL with that new string.")
-            logger.error("-" * 60)
+        logger.error(f"DJANGO SETUP CRITICAL FAILURE: {e}")
+        return
+
+    # 3. Test Connection
+    try:
+        logger.info("Testing connection to Postgres...")
+        connection.ensure_connection()
+        logger.info(f"SUCCESS: Connected to {connection.vendor} database.")
         
-    # 3. Run migrations
+        if connection.vendor == 'sqlite':
+            logger.warning("CRITICAL WARNING: App is using SQLite instead of Postgres!")
+            logger.warning("This means DATABASE_URL is either invalid or being ignored.")
+    except Exception as e:
+        logger.error(f"DATABASE CONNECTION FAILED: {e}")
+        logger.info("Check if your Supabase password has special characters like '%' and encode them as '%25'.")
+        logger.info("Also ensure you use the POOLER URL (Port 6543) instead of direct (Port 5432).")
+        return # Abort if we can't connect, no point in migrating
+
+    # 4. Run migrations
     try:
         logger.info("Running migrations...")
         call_command('migrate', interactive=False)
-        logger.info("Migrations completed successfully.")
+        logger.info("Migrations finished successfully.")
     except Exception as e:
-        logger.error(f"Migration failed: {e}")
+        logger.error(f"MIGRATION FAILED: {e}")
 
-    # 4. Create/Update Superuser
+    # 5. Create/Update Admin
     try:
         User = get_user_model()
         email = os.environ.get('ADMIN_EMAIL', 'leonardlewa372@gmail.com')
         password = os.environ.get('ADMIN_PASSWORD', 'leonard%372')
         
-        # Check if user exists by email
-        user = User.objects.filter(email=email).first()
-        if not user:
-            logger.info(f"Creating superuser: {email}")
-            User.objects.create_superuser(username=email, email=email, password=password)
-            logger.info(f"Superuser {email} created successfully.")
+        user, created = User.objects.get_or_create(email=email, defaults={'username': email})
+        user.set_password(password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.role = 'super_admin'
+        user.save()
+        
+        if created:
+            logger.info(f"Admin account CREATED: {email}")
         else:
-            logger.info(f"Superuser {email} already exists. Updating password to ensure it matches...")
-            user.set_password(password)
-            user.save()
-            logger.info("Superuser password updated successfully.")
+            logger.info(f"Admin account UPDATED (Password Reset): {email}")
             
     except Exception as e:
-        logger.error(f"Error during superuser creation/update: {e}")
+        logger.error(f"ADMIN SETUP FAILED: {e}")
+
+    logger.info("="*40)
+    logger.info("AUTO-SETUP COMPLETE")
+    logger.info("="*40)
 
 if __name__ == "__main__":
     run_setup()
