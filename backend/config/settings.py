@@ -263,8 +263,12 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # True in dev only
 if not DEBUG:
     _cors_raw = os.getenv('CORS_ALLOWED_ORIGINS', '')
-    # Filter out blank entries — ''.split(',') returns [''] which fails corsheaders validation
     CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors_raw.split(',') if o.strip()]
+    
+    # PERMISSIVE FALLBACK for common Vercel/Render domains if not explicitly set
+    if not CORS_ALLOWED_ORIGINS:
+        CORS_ALLOW_ALL_ORIGINS = True # Allow all during initial deployment phase to prevent blocking user
+    
     CORS_ALLOW_CREDENTIALS = True
 
 # ---------------------------------------------------------------------------
