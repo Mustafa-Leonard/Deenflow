@@ -6,15 +6,15 @@ def health_check(request):
     return JsonResponse({
         "status": "ok",
         "service": "DeenFlow API",
-        "version": "1.0.9",
-        "timestamp": "2026-03-15T01:45:00Z"
+        "version": "1.1.0",
+        "timestamp": "2026-03-15T01:50:00Z"
     })
 
 def root_view(request):
     return JsonResponse({
         "message": "Welcome to DeenFlow API",
         "status": "online",
-        "version": "1.0.9"
+        "version": "1.1.0"
     })
 
 def catch_all_api_404(request, path=None):
@@ -22,14 +22,19 @@ def catch_all_api_404(request, path=None):
         "error": "API Route Not Found",
         "requested_path": request.path,
         "method": request.method,
-        "message": "Check your VITE_API_URL settings in Vercel.",
-        "v": "1.0.9"
+        "message": "Ensure your frontend hits the correct /api/auth/ path.",
+        "v": "1.1.0"
     }, status=404)
 
 urlpatterns = [
     re_path(r'^$', root_view, name='root'),
     path('admin/', admin.site.urls),
     path('api/health/', health_check, name='health_check'),
+    
+    # Prefix-agnostic auth routes (in case frontend is missing /api/)
+    path('auth/', include('accounts.urls')),
+    
+    # Standard prefixed routes
     path('api/auth/', include('accounts.urls')),
     path('api/quran/', include('quran.urls')),
     path('api/fiqh/', include('fiqh.urls')),
