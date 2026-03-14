@@ -187,17 +187,27 @@ if DEBUG:
     }
 else:
     # Redis in production (requires: pip install django-redis)
-    REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': REDIS_URL,
-            'TIMEOUT': 300,
+    REDIS_URL = os.getenv('REDIS_URL')
+    if REDIS_URL:
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+                'LOCATION': REDIS_URL,
+                'TIMEOUT': 300,
+            }
         }
-    }
-    # Use Redis for sessions too (not DB) in production
-    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-    SESSION_CACHE_ALIAS = 'default'
+        # Use Redis for sessions if available
+        SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+        SESSION_CACHE_ALIAS = 'default'
+    else:
+        # Fallback if no Redis is provided in environment
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'unique-snowflake',
+            }
+        }
+        SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # ---------------------------------------------------------------------------
 # Authentication
