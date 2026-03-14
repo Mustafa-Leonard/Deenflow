@@ -10,7 +10,15 @@ def health_check(request):
         "timestamp": "2026-03-15T00:40:00Z"
     })
 
+def root_view(request):
+    return JsonResponse({
+        "message": "Welcome to DeenFlow API",
+        "status": "online",
+        "documentation": "/api/health/",
+    })
+
 urlpatterns = [
+    path('', root_view, name='root'),
     path('admin/', admin.site.urls),
     path('api/health/', health_check, name='health_check'),
     path('api/auth/', include('accounts.urls')),

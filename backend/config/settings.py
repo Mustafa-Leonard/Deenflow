@@ -94,10 +94,10 @@ INSTALLED_APPS = [
 # Middleware
 # ---------------------------------------------------------------------------
 MIDDLEWARE = [
+    'config.middleware.RemoveDoubleSlashesMiddleware', # Fix double slash 404s
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     # whitenoise serves static files in production (requires: pip install whitenoise)
-    # Skipped in DEBUG mode — Django's default static handler is used instead.
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
