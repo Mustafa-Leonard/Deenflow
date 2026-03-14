@@ -6,8 +6,8 @@ def health_check(request):
     return JsonResponse({
         "status": "ok",
         "service": "DeenFlow API",
-        "version": "1.0.6",
-        "timestamp": "2026-03-15T01:25:00Z"
+        "version": "1.0.7",
+        "timestamp": "2026-03-15T01:30:00Z"
     })
 
 def root_view(request):
@@ -15,7 +15,16 @@ def root_view(request):
         "message": "Welcome to DeenFlow API",
         "status": "online",
         "documentation": "/api/health/",
+        "v": "1.0.7"
     })
+
+def catch_all_api_404(request, path=None):
+    return JsonResponse({
+        "error": "API Route Not Found",
+        "requested_path": request.path,
+        "message": "Verify your URL matches the patterns in the documentation.",
+        "v": "1.0.7"
+    }, status=404)
 
 urlpatterns = [
     re_path(r'^$', root_view, name='root'),
@@ -40,4 +49,6 @@ urlpatterns = [
     path('api/worship/', include('worship.urls')),
     # Messaging
     path('api/messaging/', include('messaging.urls')),
+    # Catch-all for API
+    re_path(r'^api/.*$', catch_all_api_404),
 ]
