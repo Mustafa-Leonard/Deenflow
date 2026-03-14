@@ -6,16 +6,15 @@ def health_check(request):
     return JsonResponse({
         "status": "ok",
         "service": "DeenFlow API",
-        "version": "1.0.8",
-        "timestamp": "2026-03-15T01:40:00Z"
+        "version": "1.0.9",
+        "timestamp": "2026-03-15T01:45:00Z"
     })
 
 def root_view(request):
     return JsonResponse({
         "message": "Welcome to DeenFlow API",
         "status": "online",
-        "documentation": "/api/health/",
-        "v": "1.0.8"
+        "version": "1.0.9"
     })
 
 def catch_all_api_404(request, path=None):
@@ -23,8 +22,8 @@ def catch_all_api_404(request, path=None):
         "error": "API Route Not Found",
         "requested_path": request.path,
         "method": request.method,
-        "message": "Verify your URL matches the patterns in the documentation.",
-        "v": "1.0.8"
+        "message": "Check your VITE_API_URL settings in Vercel.",
+        "v": "1.0.9"
     }, status=404)
 
 urlpatterns = [
