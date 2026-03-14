@@ -187,8 +187,9 @@ if DEBUG:
     }
 else:
     # Redis in production (requires: pip install django-redis)
+    # Production Cache logic
     REDIS_URL = os.getenv('REDIS_URL')
-    if REDIS_URL:
+    if REDIS_URL and REDIS_URL.strip():
         CACHES = {
             'default': {
                 'BACKEND': 'django.core.cache.backends.redis.RedisCache',
@@ -196,15 +197,13 @@ else:
                 'TIMEOUT': 300,
             }
         }
-        # Use Redis for sessions if available
         SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-        SESSION_CACHE_ALIAS = 'default'
     else:
-        # Fallback if no Redis is provided in environment
+        # ABSOLUTE FALLBACK: Use local memory cache (no Redis needed)
         CACHES = {
             'default': {
                 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-                'LOCATION': 'unique-snowflake',
+                'LOCATION': 'deenflow-fallback-cache',
             }
         }
         SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -237,14 +236,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': os.getenv('DRF_ANON_RATE', '20/min'),
-        'user': os.getenv('DRF_USER_RATE', '120/min'),
-    },
+    'DEFAULT_THROTTLE_CLASSES': [],
+    'DEFAULT_THROTTLE_RATES': {},
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],

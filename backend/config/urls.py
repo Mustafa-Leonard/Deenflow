@@ -3,7 +3,12 @@ from django.urls import path, include
 from django.http import JsonResponse
 
 def health_check(request):
-    return JsonResponse({"status": "ok", "service": "DeenFlow API"})
+    return JsonResponse({
+        "status": "ok",
+        "service": "DeenFlow API",
+        "version": "1.0.4",
+        "timestamp": "2026-03-15T00:40:00Z"
+    })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
