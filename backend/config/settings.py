@@ -187,14 +187,11 @@ if DEBUG:
     }
 else:
     # Redis in production (requires: pip install django-redis)
-    REDIS_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+    REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.redis.RedisCache',
             'LOCATION': REDIS_URL,
-            'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            },
             'TIMEOUT': 300,
         }
     }
