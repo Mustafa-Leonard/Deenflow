@@ -1,16 +1,14 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.http import JsonResponse
 
 def health_check(request):
     return JsonResponse({
         "status": "ok",
         "service": "DeenFlow API",
-        "version": "1.0.5",
-        "timestamp": "2026-03-15T01:15:00Z"
+        "version": "1.0.6",
+        "timestamp": "2026-03-15T01:25:00Z"
     })
-
-handler404 = 'config.error_handlers.custom_404'
 
 def root_view(request):
     return JsonResponse({
@@ -18,8 +16,6 @@ def root_view(request):
         "status": "online",
         "documentation": "/api/health/",
     })
-
-from django.urls import path, include, re_path
 
 urlpatterns = [
     re_path(r'^$', root_view, name='root'),
