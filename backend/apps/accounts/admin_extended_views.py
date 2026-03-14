@@ -185,9 +185,27 @@ CONTENT_STORE = []
 def admin_content(request):
     """List or create content (mapping to LearningPath/Career Notes)"""
     from learning.models import LearningPath
+    from django.db.models import Q
     
     if request.method == 'GET':
+        search = request.GET.get('search', '')
+        status_filter = request.GET.get('status', '')
+        category_filter = request.GET.get('category', '')
+        
         paths = LearningPath.objects.all().order_by('-created_at')
+        
+        if search:
+            paths = paths.filter(Q(title__icontains=search) | Q(slug__icontains=search))
+        
+        if status_filter:
+            if status_filter == 'published':
+                paths = paths.filter(is_published=True)
+            elif status_filter == 'draft':
+                paths = paths.filter(is_published=False)
+        
+        # Note: LearningPath doesn't have a 'category' field in the model yet, 
+        # so we assume all are 'Academy' for now for the list view logic.
+        
         results = []
         for p in paths:
             results.append({
@@ -198,30 +216,62 @@ def admin_content(request):
                 'author': 'Content Team',
                 'status': 'published' if p.is_published else 'draft',
                 'is_premium': p.is_premium,
-                'updated_at': p.created_at # Assuming created_at for now
+                'updated_at': p.created_at.isoformat()
             })
         return Response(results)
     
-    # POST - Create new LearningPath (Stub for now, or implement)
-    # Mapping request.data to LearningPath fields
-    return Response({'detail': 'Creation via API enabled, mapping in progress'}, status=201)
+    # POST - Create new LearningPath
+    try:
+        data = request.data
+        path = LearningPath.objects.create(
+            title=data.get('title'),
+            slug=data.get('slug') or data.get('title').lower().replace(' ', '-'),
+            description=data.get('body', '')[:200], # basic mapping
+            difficulty='beginner',
+            is_published=data.get('status') == 'published'
+        )
+        return Response({'id': path.id, 'status': 'success'}, status=201)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=400)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def admin_content_detail(request, content_id):
     """Get, update, or delete content"""
-    for i, item in enumerate(CONTENT_STORE):
-        if item.get('id') == content_id:
-            if request.method == 'GET':
-                return Response(item)
-            elif request.method == 'PUT':
-                CONTENT_STORE[i].update(request.data)
-                return Response(CONTENT_STORE[i])
-            elif request.method == 'DELETE':
-                CONTENT_STORE.pop(i)
-                return Response(status=status.HTTP_204_NO_CONTENT)
-    return Response({'detail': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+    from learning.models import LearningPath
+    try:
+        path = LearningPath.objects.get(id=content_id)
+        if request.method == 'GET':
+            return Response({
+                'id': path.id,
+                'title': path.title,
+                'slug': path.slug,
+                'body': path.description, # Mapping description to body for the editor
+                'description': path.description,
+                'category': 'Academy',
+                'status': 'published' if path.is_published else 'draft',
+                'is_published': path.is_published,
+                'is_premium': path.is_premium,
+                'difficulty': path.difficulty,
+                'thumbnail': path.thumbnail,
+                'tags': [], # No tags in model yet
+                'sources': [] # No sources in model yet
+            })
+        elif request.method == 'PUT':
+            data = request.data
+            path.title = data.get('title', path.title)
+            path.slug = data.get('slug', path.slug)
+            path.description = data.get('body', path.description)
+            path.is_published = data.get('status') == 'published'
+            path.is_premium = data.get('is_premium', path.is_premium)
+            path.save()
+            return Response({'status': 'success'})
+        elif request.method == 'DELETE':
+            path.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+    except LearningPath.DoesNotExist:
+        return Response({'detail': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])

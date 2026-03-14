@@ -4,6 +4,7 @@ import AuthContext from '../contexts/AuthContext'
 
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useContext(AuthContext)
+  const location = useLocation()
 
   if (loading) {
     return (
@@ -13,7 +14,6 @@ export default function ProtectedRoute({ children }) {
     )
   }
 
-  const location = useLocation()
   if (!user) return <Navigate to="/login" state={{ from: location }} replace />
   return children
 }

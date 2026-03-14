@@ -12,6 +12,14 @@ class LearningPath(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        intro_keywords = ['introduction', 'basics', 'fundamentals', 'beginner', 'starting']
+        title_lower = self.title.lower()
+        if any(keyword in title_lower for keyword in intro_keywords):
+            self.is_premium = False
+            self.price = 0.00
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.title
 

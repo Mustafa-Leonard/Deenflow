@@ -1,36 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import api from '../api'
+import React from 'react'
+import { useNotifications } from '../contexts/NotificationContext'
 import Card from '../components/Card'
 
 export default function NotificationsPage() {
-    const [notifications, setNotifications] = useState([])
-    const [loading, setLoading] = useState(true)
+    const { notifications, loading, markAsRead } = useNotifications()
 
-    useEffect(() => {
-        fetchNotifications()
-    }, [])
-
-    const fetchNotifications = async () => {
-        try {
-            const res = await api.get('/notifications/')
-            setNotifications(res.data)
-        } catch (error) {
-            console.error('Failed to fetch notifications:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const markAsRead = async (id) => {
-        try {
-            await api.patch(`/notifications/${id}/`, { is_read: true })
-            setNotifications(notifications.map(n => n.id === id ? { ...n, is_read: true } : n))
-        } catch (error) {
-            console.error('Failed to mark as read:', error)
-        }
-    }
-
-    if (loading) return <div className="p-20 text-center animate-pulse text-slate-500">Retrieving alerts...</div>
+    if (loading && notifications.length === 0) return <div className="p-20 text-center animate-pulse text-slate-500">Retrieving alerts...</div>
 
     return (
         <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom duration-700">

@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     # Third-party
     'rest_framework',
     'corsheaders',
+    'rest_framework_simplejwt.token_blacklist',
     # DeenFlow apps
     'accounts',
     'roles',
@@ -76,6 +77,17 @@ INSTALLED_APPS = [
     'referrals',
     'marketplace',
     'donations',
+    # Worship apps
+    'worship.dhikr',
+    'worship.duas',
+    'worship.prayer',
+    'worship.audio',
+    'worship.translations',
+    'worship.reminders',
+    'worship.categories',
+    'worship.favorites',
+    'worship.asmaul_husna',
+    'messaging',
 ]
 
 # ---------------------------------------------------------------------------
@@ -203,7 +215,7 @@ AUTHENTICATION_BACKENDS = [
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-     'OPTIONS': {'min_length': 12}},
+     'OPTIONS': {'min_length': 6}},
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]

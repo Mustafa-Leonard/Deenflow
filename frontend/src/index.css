@@ -2,14 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+/* ─── GOOGLE FONTS ─────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap');
 
-  /* ─── THEME TRANSITION ROOT ─────────────────────────────────────────
-     Apply transitions ONLY on the root html element. This lets the
-     browser repaint the entire page palette in one single coordinated
-     pass — no element fights another, no "collapsing" ripple effect.
-     250ms feels instant yet polished. cubic-bezier gives a firm snap.
-  ─────────────────────────────────────────────────────────────────── */
+@layer base {
+  /* ─── THEME TRANSITION ROOT ─────────────────────────────────────────── */
   html {
     scrollbar-gutter: stable;
     transition:
@@ -17,47 +14,35 @@
       color 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Disable transitions on first paint (class removed by ThemeContext after mount) */
   html.no-transition,
   html.no-transition * {
     transition: none !important;
   }
 
   body {
-    @apply antialiased text-slate-900 bg-slate-50 font-sans;
+    @apply antialiased text-slate-800 bg-[#f5f5f5] font-sans;
+    font-size: 15px;
+    line-height: 1.6;
   }
 
   .dark body {
     @apply text-slate-100 bg-slate-950;
   }
 
-  /* ─── THEME-SENSITIVE ELEMENTS ──────────────────────────────────────
-     Only background-color, color, border-color, and fill/stroke need
-     to transition for theme switches. We use a SHORT duration (200ms)
-     to keep things snappy. NO layout properties (width, height,
-     transform) are included so sidebar/accordion animations are
-     completely unaffected.
-  ─────────────────────────────────────────────────────────────────── */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+
+  /* ─── THEME-SENSITIVE ELEMENTS ─────────────────────────────────────── */
   *,
   *::before,
   *::after {
     transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity;
     transition-duration: 200ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* ─── EXCEPTION: Never slow down animated / layout elements ─────── */
-  /* Anything with an explicit animation or motion transition should
-     define its own duration — the rule below resets the theme
-     transition so it can't interfere. */
-  [class*="animate-"],
-  [class*="transition-all"],
-  [class*="transition-transform"],
-  [class*="duration-"] {
-    /* These elements manage their own transition-duration. The theme
-       duration above still covers background-color specifically,
-       but won't override their explicit duration values because CSS
-       specificity keeps them separate. */
   }
 }
 
@@ -67,24 +52,89 @@ body,
   height: 100%;
 }
 
-/* ─── GLASS MORPHISM ─────────────────────────────────────────────────── */
+/* ─── DESIGN SYSTEM COMPONENTS ──────────────────────────────────────────── */
+
+/* Cards — the universal white card style */
+.deen-card {
+  @apply bg-white rounded-xl shadow-card border border-slate-100/80 overflow-hidden;
+}
+
+.dark .deen-card {
+  @apply bg-slate-900 border-slate-800;
+}
+
+/* Primary button — Islamic green */
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg shadow-green transition-all duration-200 active:scale-[0.98] tracking-wide;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Secondary button — outline green */
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent border-2 border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white font-semibold rounded-lg transition-all duration-200 active:scale-[0.98] tracking-wide;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Ghost button — minimal */
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-100 hover:text-brand-600 font-medium rounded-lg transition-all duration-200;
+}
+
+/* Nav link */
+.nav-link {
+  @apply text-slate-600 hover:text-brand-600 font-medium text-sm transition-colors duration-200 tracking-wide;
+}
+
+.nav-link.active {
+  @apply text-brand-600 font-semibold;
+}
+
+/* ─── TAB SYSTEM ─────────────────────────────────────────────────────────── */
+.tab-active {
+  @apply bg-brand-600 text-white shadow-sm;
+}
+
+.tab-inactive {
+  @apply text-slate-500 hover:text-slate-800 hover:bg-slate-100;
+}
+
+/* ─── GLASS MORPHISM ─────────────────────────────────────────────────────── */
 .glass {
-  @apply bg-white/70 backdrop-blur-md border border-white/20;
+  @apply bg-white/80 backdrop-blur-md border border-white/30;
 }
 
 .dark .glass {
-  @apply bg-slate-900/70 border-slate-700/50;
+  @apply bg-slate-900/80 border-slate-700/50;
 }
 
-/* ─── GRADIENT TEXT ──────────────────────────────────────────────────── */
+/* ─── GRADIENT TEXT ──────────────────────────────────────────────────────── */
 .gradient-text {
-  @apply text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-brand-400;
+  @apply text-transparent bg-clip-text;
+  background-image: linear-gradient(135deg, #1a8f5c, #48bc89);
 }
 
-/* ─── SCROLLBAR ──────────────────────────────────────────────────────── */
+/* ─── SIDEBAR LINK ───────────────────────────────────────────────────────── */
+.sidebar-link {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-700 transition-all duration-200;
+  font-family: 'Inter', sans-serif;
+}
+
+.sidebar-link.active {
+  @apply bg-brand-600 text-white shadow-green;
+}
+
+.dark .sidebar-link {
+  @apply text-slate-400 hover:bg-brand-900/30 hover:text-brand-300;
+}
+
+.dark .sidebar-link.active {
+  @apply bg-brand-700 text-white;
+}
+
+/* ─── SCROLLBAR ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -99,7 +149,72 @@ body,
   @apply bg-slate-300 dark:bg-slate-600;
 }
 
-/* ─── ARABIC FONT ────────────────────────────────────────────────────── */
+/* ─── ARABIC FONT ────────────────────────────────────────────────────────── */
 .font-arabic {
   font-family: 'Amiri', serif;
+}
+
+/* ─── MOSQUE HERO BACKGROUND ─────────────────────────────────────────────── */
+.mosque-hero-bg {
+  background-image: url('/mosque-hero.png');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+/* ─── GREEN SECTION ──────────────────────────────────────────────────────── */
+.section-green {
+  background: linear-gradient(135deg, #1a8f5c 0%, #14532d 100%);
+}
+
+/* ─── ANIMATIONS ─────────────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out both;
+}
+
+.anim-delay-100 { animation-delay: 0.1s; }
+.anim-delay-200 { animation-delay: 0.2s; }
+.anim-delay-300 { animation-delay: 0.3s; }
+.anim-delay-400 { animation-delay: 0.4s; }
+.anim-delay-500 { animation-delay: 0.5s; }
+
+/* ─── ISLAMIC PATTERN ACCENT ─────────────────────────────────────────────── */
+.islamic-accent {
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(26,143,92,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(26,143,92,0.06) 0%, transparent 50%);
+}
+
+/* ─── HERO OVERLAY ───────────────────────────────────────────────────────── */
+.hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(8, 41, 29, 0.55) 0%,
+    rgba(8, 41, 29, 0.30) 40%,
+    rgba(0, 0, 0, 0.72) 100%
+  );
+}
+
+/* ─── PAGE SECTION SPACING ───────────────────────────────────────────────── */
+.section-padding {
+  @apply py-20 px-6;
+}
+
+/* ─── FOOTER DARK GREEN ──────────────────────────────────────────────────── */
+.footer-bg {
+  background: linear-gradient(180deg, #0d3d26 0%, #08291d 100%);
 }

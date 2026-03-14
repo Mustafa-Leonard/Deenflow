@@ -2,11 +2,13 @@ import React, { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthContext from '../../contexts/AuthContext'
 import { ThemeContext } from '../../contexts/ThemeContext'
+import { useNotifications } from '../../contexts/NotificationContext'
 
 export default function AppTopbar({ setIsOpen }) {
     const navigate = useNavigate()
     const { user, logout } = useContext(AuthContext)
     const { theme, toggleTheme } = useContext(ThemeContext)
+    const { notifications, unreadCount, markAsRead } = useNotifications()
     const [showProfileMenu, setShowProfileMenu] = useState(false)
     const [showNotifications, setShowNotifications] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
@@ -16,17 +18,8 @@ export default function AppTopbar({ setIsOpen }) {
         navigate('/login')
     }
 
-    // Mock notifications
-    const notifications = [
-        { id: 1, text: 'Your question was answered', time: '5m ago', unread: true },
-        { id: 2, text: 'New lesson available: Tafsir Basics', time: '1h ago', unread: true },
-        { id: 3, text: 'Community post liked', time: '2h ago', unread: false }
-    ]
-
-    const unreadCount = notifications.filter(n => n.unread).length
-
     return (
-        <header className="fixed top-0 right-0 left-0 lg:left-72 h-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-40 transition-all duration-300">
+        <header className="fixed top-0 right-0 left-0 lg:left-64 h-20 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-40 transition-all duration-300 shadow-sm">
             <div className="h-full px-4 sm:px-8 flex items-center justify-between max-w-7xl mx-auto w-full gap-4">
 
                 {/* Mobile Menu Toggle */}
@@ -118,23 +111,24 @@ export default function AppTopbar({ setIsOpen }) {
                                         notifications.map((notif) => (
                                             <div
                                                 key={notif.id}
-                                                className={`p-4 border-b last:border-0 border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group relative ${notif.unread ? 'bg-brand-50/30 dark:bg-brand-900/10' : ''
+                                                onClick={() => !notif.is_read && markAsRead(notif.id)}
+                                                className={`p-4 border-b last:border-0 border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group relative ${!notif.is_read ? 'bg-brand-50/30 dark:bg-brand-900/10' : ''
                                                     }`}
                                             >
-                                                {notif.unread && (
+                                                {!notif.is_read && (
                                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-500 scale-y-0 group-hover:scale-y-100 transition-transform duration-300"></div>
                                                 )}
                                                 <div className="flex items-start gap-4">
-                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg ${notif.unread ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg ${!notif.is_read ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
                                                         {notif.icon || '📢'}
                                                     </div>
                                                     <div className="flex-1 min-w-0 pt-0.5">
-                                                        <div className={`text-sm ${notif.unread ? 'font-bold text-slate-900 dark:text-white' : 'font-medium text-slate-600 dark:text-slate-300'}`}>
-                                                            {notif.text}
+                                                        <div className={`text-sm ${!notif.is_read ? 'font-bold text-slate-900 dark:text-white' : 'font-medium text-slate-600 dark:text-slate-300'}`}>
+                                                            {notif.title}
                                                         </div>
                                                         <div className="text-xs text-slate-400 dark:text-slate-500 mt-1 flex items-center gap-2">
-                                                            <span>{notif.time}</span>
-                                                            {notif.unread && <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>}
+                                                            <span>{new Date(notif.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                            {!notif.is_read && <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>}
                                                         </div>
                                                     </div>
                                                 </div>

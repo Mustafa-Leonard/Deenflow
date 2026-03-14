@@ -3,10 +3,7 @@ import { NavLink } from 'react-router-dom'
 import AuthContext from '../../contexts/AuthContext'
 
 const adminLinkClass = ({ isActive }) =>
-    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group " +
-    (isActive
-        ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-lg shadow-brand-500/30 translate-x-1'
-        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-brand-600 dark:hover:text-brand-400 hover:translate-x-1')
+    "sidebar-link " + (isActive ? 'active' : '')
 
 export default function AdminSidebar({ isOpen, setIsOpen }) {
     const { user } = useContext(AuthContext)
@@ -23,8 +20,8 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
             items: [
                 { to: '/admin/content', icon: '📝', label: 'Career Notes Mgt' },
                 { to: '/admin/fiqh', icon: '⚖️', label: 'Fiqh Library' },
-                { to: '/admin/reviews', icon: '✅', label: 'Moderation Queue' },
-                { to: '/admin/quran', icon: '🕌', label: "Qur'an Management" }
+                { to: '/admin/worship', icon: '🕌', label: 'Worship Content' },
+                { to: '/admin/quran', icon: '📖', label: "Qur'an Management" }
             ]
         },
         {
@@ -40,7 +37,8 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
             items: [
                 { to: '/admin/scholars', icon: '👳', label: 'Scholars' },
                 { to: '/admin/users', icon: '👥', label: 'User Base' },
-                { to: '/admin/roles', icon: '🔐', label: 'Access Control' }
+                { to: '/admin/roles', icon: '🔐', label: 'Access Control' },
+                { to: '/admin/messages', icon: '💌', label: 'Messaging' }
             ]
         },
         {
@@ -54,7 +52,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
     ]
 
     return (
-        <aside className={`fixed lg:sticky top-0 left-0 w-72 h-screen bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <aside className={`fixed lg:sticky top-0 left-0 w-64 h-screen bg-white dark:bg-slate-950 border-r border-slate-100 dark:border-slate-800 flex flex-col z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             {/* Branding - Fixed Top */}
             <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm">
                 <div className="flex items-center gap-2 group cursor-pointer">

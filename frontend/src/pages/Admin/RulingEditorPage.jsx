@@ -10,9 +10,10 @@ export default function RulingEditorPage() {
     const [formData, setFormData] = useState({
         title: '',
         topic: '',
-        description: '',
         ruling_text: '',
-        scholar_name: '',
+        scholar: '',
+        scholar_reference: '',
+        fiqh_school: '',
         verification_status: 'draft',
         tags: [],
         evidence_quran: [],
@@ -88,18 +89,21 @@ export default function RulingEditorPage() {
                             <option value="family">Family</option>
                             <option value="halal">Halal / Haram</option>
                             <option value="worship">Worship</option>
+                            <option value="dietary">Dietary Law</option>
+                            <option value="business">Business</option>
+                            <option value="modern_issues">Modern Issues</option>
                         </select>
                     </div>
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Short Summary</label>
+                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Scholar Reference / Context</label>
                     <textarea
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        value={formData.scholar_reference}
+                        onChange={(e) => setFormData({ ...formData, scholar_reference: e.target.value })}
                         rows="2"
                         className="w-full px-5 py-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none"
-                        placeholder="Brief overview of the ruling (internal only)"
+                        placeholder="Detailed scholarly reference or contextual notes"
                     />
                 </div>
 
@@ -115,15 +119,26 @@ export default function RulingEditorPage() {
                     />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Scholar / Source Name</label>
+                        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Scholar / Source</label>
                         <input
                             required
                             type="text"
-                            value={formData.scholar_name}
-                            onChange={(e) => setFormData({ ...formData, scholar_name: e.target.value })}
+                            value={formData.scholar}
+                            onChange={(e) => setFormData({ ...formData, scholar: e.target.value })}
                             className="w-full px-5 py-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none"
+                            placeholder="e.g. Al-Azhar, Sheikh... etc."
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Fiqh School (Madhab)</label>
+                        <input
+                            type="text"
+                            value={formData.fiqh_school}
+                            onChange={(e) => setFormData({ ...formData, fiqh_school: e.target.value })}
+                            className="w-full px-5 py-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none"
+                            placeholder="e.g. Hanafi, Shafi'i, General"
                         />
                     </div>
                     <div className="space-y-2">

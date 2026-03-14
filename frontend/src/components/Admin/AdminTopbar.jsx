@@ -2,11 +2,13 @@ import React, { useState, useContext, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthContext from '../../contexts/AuthContext'
 import { ThemeContext } from '../../contexts/ThemeContext'
+import { useNotifications } from '../../contexts/NotificationContext'
 
 export default function AdminTopbar({ setIsOpen }) {
     const navigate = useNavigate()
     const { user, logout } = useContext(AuthContext)
     const { theme, toggleTheme } = useContext(ThemeContext)
+    const { notifications, unreadCount, markAsRead } = useNotifications()
     const [showProfileMenu, setShowProfileMenu] = useState(false)
     const [showNotifications, setShowNotifications] = useState(false)
     const [showLogoutModal, setShowLogoutModal] = useState(false)
@@ -43,7 +45,7 @@ export default function AdminTopbar({ setIsOpen }) {
 
     return (
         <>
-            <header className="fixed top-0 right-0 left-0 lg:left-0 h-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-40 transition-all duration-300">
+            <header className="fixed top-0 right-0 left-0 lg:left-64 h-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-40 transition-all duration-300 shadow-sm">
                 <div className="h-full px-4 sm:px-8 flex items-center justify-between gap-4">
                     {/* Mobile Menu Toggle */}
                     <button
@@ -96,23 +98,53 @@ export default function AdminTopbar({ setIsOpen }) {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                 </svg>
-                                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-slate-900 animate-pulse"></span>
+                                {unreadCount > 0 && (
+                                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-slate-900 animate-pulse"></span>
+                                )}
                             </button>
 
                             {showNotifications && (
                                 <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl shadow-slate-200/50 dark:shadow-black/50 border border-slate-200 dark:border-slate-800 overflow-hidden transform origin-top-right transition-all">
                                     <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex justify-between items-center">
                                         <h3 className="font-bold text-slate-900 dark:text-white text-sm">Notifications</h3>
-                                        <button className="text-[10px] text-brand-600 font-bold hover:underline">MARK ALL READ</button>
+                                        <button
+                                            onClick={() => navigate('/app/notifications')}
+                                            className="text-[10px] text-brand-600 font-bold hover:underline"
+                                        >
+                                            VIEW ALL
+                                        </button>
                                     </div>
                                     <div className="max-h-80 overflow-auto">
-                                        <div className="flex flex-col items-center justify-center p-8 text-center text-slate-500 dark:text-slate-400">
-                                            <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-3">
-                                                <span className="text-xl">🔔</span>
+                                        {notifications.length === 0 ? (
+                                            <div className="flex flex-col items-center justify-center p-8 text-center text-slate-500 dark:text-slate-400">
+                                                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-3">
+                                                    <span className="text-xl">🔔</span>
+                                                </div>
+                                                <p className="text-sm font-medium">No new notifications</p>
+                                                <p className="text-xs opacity-70 mt-1">You're all caught up!</p>
                                             </div>
-                                            <p className="text-sm font-medium">No new notifications</p>
-                                            <p className="text-xs opacity-70 mt-1">You're all caught up!</p>
-                                        </div>
+                                        ) : (
+                                            notifications.map(notif => (
+                                                <div
+                                                    key={notif.id}
+                                                    onClick={() => !notif.is_read && markAsRead(notif.id)}
+                                                    className={`p-4 border-b last:border-0 border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer ${!notif.is_read ? 'bg-brand-50/20 dark:bg-brand-900/10' : ''}`}
+                                                >
+                                                    <div className="flex gap-3">
+                                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${!notif.is_read ? 'bg-brand-100 text-brand-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                                                            {notif.icon || '📢'}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className={`text-xs truncate font-bold ${!notif.is_read ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>{notif.title}</div>
+                                                            <div className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">{notif.message}</div>
+                                                            <div className="text-[9px] text-slate-400 mt-1 uppercase tracking-wider font-bold">
+                                                                {new Date(notif.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
                             )}

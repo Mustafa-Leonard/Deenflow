@@ -23,4 +23,8 @@ urlpatterns = [
     path('api/analytics/', include('analytics.urls')),
     path('api/learning/', include('learning.urls')),
     path('api/sis/', include('spiritual_intelligence_service.urls')),
+    # Worship Domain
+    path('api/worship/', include('worship.urls')),
+    # Messaging
+    path('api/messaging/', include('messaging.urls')),
 ]

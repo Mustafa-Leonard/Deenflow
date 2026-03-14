@@ -1,40 +1,33 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import api from '../../api'
 
-const mockReports = [
-    { id: 1, type: 'question', contentId: 12, contentPreview: 'Is Bitcoin halal or haram in Islam?', reporter: 'user@email.com', reason: 'Misleading information', details: 'The AI answer does not cite any authentic sources and makes a definitive halal ruling without scholarly backing', status: 'pending', priority: 'high', createdAt: '2026-02-18T14:30:00Z' },
-    { id: 2, type: 'answer', contentId: 45, contentPreview: 'Regarding marriage to People of the Book...', reporter: 'student@email.com', reason: 'Inaccurate ruling', details: 'This answer contradicts the majority scholarly opinion on conditions for marriage to Ahl al-Kitab', status: 'pending', priority: 'critical', createdAt: '2026-02-18T10:15:00Z' },
-    { id: 3, type: 'comment', contentId: 89, contentPreview: 'You are following bid\'ah and will go to hell...', reporter: 'member@email.com', reason: 'Hate speech / Takfir', details: 'User is making takfir (declaring others as disbelievers) which violates community guidelines', status: 'pending', priority: 'critical', createdAt: '2026-02-17T22:40:00Z' },
-    { id: 4, type: 'question', contentId: 33, contentPreview: 'What is the ruling on music in Islam?', reporter: 'user2@email.com', reason: 'One-sided opinion', details: 'Only presents the strict view without mentioning other scholarly opinions', status: 'resolved', priority: 'medium', createdAt: '2026-02-16T09:20:00Z', resolvedBy: 'admin@deenflow.com', resolvedAt: '2026-02-16T11:00:00Z', resolution: 'Updated answer to include multiple scholarly opinions' },
-    { id: 5, type: 'answer', contentId: 67, contentPreview: 'According to the Quran, women cannot...', reporter: 'sister@email.com', reason: 'Misogynistic interpretation', details: 'Answer presents a culturally biased interpretation as Islamic ruling', status: 'dismissed', priority: 'medium', createdAt: '2026-02-15T16:45:00Z', resolvedBy: 'admin@deenflow.com', resolvedAt: '2026-02-15T18:00:00Z', resolution: 'Content reviewed — answer accurately represents scholarly opinion with proper nuance' },
-]
-
-const reportReasons = [
-    'Misleading information',
-    'Inaccurate ruling',
-    'One-sided opinion',
-    'Hate speech / Takfir',
-    'Misogynistic interpretation',
-    'Sectarian bias',
-    'Inappropriate content',
-    'Spam',
-    'Other',
-]
-
 export default function ReportedContentPage() {
-    const [reports, setReports] = useState(mockReports)
+    const [reports, setReports] = useState([])
     const [selectedReport, setSelectedReport] = useState(null)
     const [showActionModal, setShowActionModal] = useState(false)
     const [filterStatus, setFilterStatus] = useState('pending')
     const [filterPriority, setFilterPriority] = useState('all')
     const [actionType, setActionType] = useState('')
     const [actionNote, setActionNote] = useState('')
+    const [loading, setLoading] = useState(true)
+
+    const fetchReports = useCallback(async () => {
+        try {
+            const res = await api.get('/auth/admin/moderation/reports/')
+            if (Array.isArray(res.data)) setReports(res.data)
+        } catch {
+            // If endpoint doesn't exist yet, show empty state
+        } finally {
+            setLoading(false)
+        }
+    }, [])
 
     useEffect(() => {
-        api.get('/auth/admin/moderation/reports/')
-            .then(res => { if (res.data?.length) setReports(res.data) })
-            .catch(() => { })
-    }, [])
+        fetchReports()
+        // Poll every 15 seconds for realtime updates
+        const interval = setInterval(fetchReports, 15000)
+        return () => clearInterval(interval)
+    }, [fetchReports])
 
     const filteredReports = reports.filter(r => {
         const matchStatus = filterStatus === 'all' || r.status === filterStatus
@@ -120,8 +113,8 @@ export default function ReportedContentPage() {
                         key={status}
                         onClick={() => setFilterStatus(status)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterStatus === status
-                                ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-md'
-                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                            ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-md'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                             }`}
                     >
                         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -147,8 +140,8 @@ export default function ReportedContentPage() {
                     <div
                         key={report.id}
                         className={`bg-white dark:bg-slate-900 rounded-2xl border shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md ${report.priority === 'critical' && report.status === 'pending'
-                                ? 'border-red-200 dark:border-red-900/50'
-                                : 'border-slate-200 dark:border-slate-800'
+                            ? 'border-red-200 dark:border-red-900/50'
+                            : 'border-slate-200 dark:border-slate-800'
                             }`}
                     >
                         <div className="p-5">
@@ -269,10 +262,10 @@ export default function ReportedContentPage() {
                             <button
                                 onClick={handleAction}
                                 className={`px-6 py-2.5 rounded-xl text-sm font-semibold shadow-lg transition-all ${actionType === 'remove'
-                                        ? 'bg-red-500 text-white hover:bg-red-600'
-                                        : actionType === 'dismiss'
-                                            ? 'bg-slate-500 text-white hover:bg-slate-600'
-                                            : 'bg-gradient-to-r from-brand-600 to-brand-500 text-white hover:shadow-brand-500/40'
+                                    ? 'bg-red-500 text-white hover:bg-red-600'
+                                    : actionType === 'dismiss'
+                                        ? 'bg-slate-500 text-white hover:bg-slate-600'
+                                        : 'bg-gradient-to-r from-brand-600 to-brand-500 text-white hover:shadow-brand-500/40'
                                     }`}
                             >
                                 Confirm {actionType.charAt(0).toUpperCase() + actionType.slice(1)}

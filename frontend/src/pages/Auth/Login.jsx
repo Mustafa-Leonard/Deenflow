@@ -46,68 +46,79 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex bg-white font-sans overflow-hidden">
-      {/* Visual Side */}
-      <div className="hidden lg:flex lg:w-1/2 bg-slate-950 relative items-center justify-center p-12 overflow-hidden">
-        <div className="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-brand-600/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 bg-brand-400/20 rounded-full blur-3xl"></div>
-
+    <div className="min-h-screen flex bg-[#f5f5f5] font-sans">
+      {/* Visual Side — mosque-themed */}
+      <div className="hidden lg:flex lg:w-1/2 mosque-hero-bg relative items-center justify-center p-12 overflow-hidden">
+        <div className="hero-overlay absolute inset-0" />
         <div className="relative z-10 max-w-md text-white">
-          <div className="mb-12">
-            <img src="/deenflow-logo.svg" alt="DeenFlow" className="h-10 w-auto brightness-0 invert" />
-            <div className="text-sm uppercase tracking-[0.3em] font-semibold text-brand-300 mt-2">Islamic Guidance System</div>
-          </div>
-          <h2 className="text-4xl font-display font-bold mb-6 leading-tight">Wisdom for the modern context.</h2>
-          <p className="text-slate-400 text-lg leading-relaxed mb-8">
-            Access intelligent, context-aware Islamic analysis for daily life situations, business ethics, and personal growth.
+          <Link to="/" className="flex items-center gap-2 mb-10">
+            <div className="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-sm">☽</div>
+            <span className="font-display font-bold text-2xl text-white">Deen<span className="text-brand-300">Flow</span></span>
+          </Link>
+
+          <h2 className="text-4xl font-display font-bold mb-4 leading-tight">
+            Welcome Back to<br />
+            <span className="text-brand-300">Your Journey</span>
+          </h2>
+          <p className="text-white/70 text-base leading-relaxed mb-10" style={{ fontFamily: 'Inter, sans-serif' }}>
+            Continue your path of Islamic learning, worship, and community engagement.
           </p>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md">
-              <div className="text-2xl font-bold mb-1">99%</div>
-              <div className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Accuracy Range</div>
-            </div>
-            <div className="p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md">
-              <div className="text-2xl font-bold mb-1">Instant</div>
-              <div className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Analysis Speed</div>
-            </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { val: '50K+', label: 'Members' },
+              { val: '99%', label: 'Accuracy' },
+              { val: '114', label: 'Surahs' },
+              { val: '24/7', label: 'AI Guidance' },
+            ].map(s => (
+              <div key={s.label} className="p-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+                <div className="text-2xl font-display font-bold text-white mb-1">{s.val}</div>
+                <div className="text-[11px] uppercase font-bold text-white/50 tracking-widest">{s.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Form Side */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 relative">
-        <div className="absolute top-8 left-8 lg:hidden">
-          <img src="/deenflow-logo.svg" alt="DeenFlow" className="h-8 w-auto" />
+        {/* Mobile logo */}
+        <div className="absolute top-6 left-6 lg:hidden flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white text-xs font-bold">☽</div>
+          <span className="font-display font-bold text-lg text-brand-700">DeenFlow</span>
         </div>
 
-        <div className="w-full max-w-sm animate-in fade-in slide-in-from-right-4 duration-700">
-          <div className="mb-10">
-            <h2 className="text-3xl font-display font-bold text-slate-900 mb-2 tracking-tight">Welcome back</h2>
-            <p className="text-slate-500 font-medium">Please enter your credentials to continue.</p>
+        <div className="w-full max-w-sm animate-fade-in-up">
+          <div className="mb-8">
+            <h1 className="text-3xl font-display font-bold text-slate-900 mb-2">Sign In</h1>
+            <p className="text-slate-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+              Enter your credentials to access your account.
+            </p>
           </div>
 
           <form onSubmit={submit} className="space-y-5">
             {error && (
-              <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-medium animate-in fade-in slide-in-from-top-2">
+              <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-medium animate-fade-in">
                 {error}
               </div>
             )}
+
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="mustafa@gmail.com"
+                placeholder="you@example.com"
                 required
-                className="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all text-slate-900 font-medium"
+                className="w-full bg-white border border-slate-200 p-3.5 rounded-xl outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition-all text-slate-900 font-medium text-sm shadow-sm"
               />
             </div>
 
             <div className="space-y-1.5">
-              <div className="flex justify-between items-center ml-1">
-                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Password</label>
-                <a href="#" className="text-[10px] font-bold text-brand-600 hover:text-brand-700 uppercase tracking-widest">Forgot?</a>
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Password</label>
+                <a href="#" className="text-xs font-semibold text-brand-600 hover:text-brand-700">Forgot?</a>
               </div>
               <input
                 value={password}
@@ -115,47 +126,60 @@ export default function Login() {
                 placeholder="••••••••"
                 type="password"
                 required
-                className="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all text-slate-900 font-medium"
+                className="w-full bg-white border border-slate-200 p-3.5 rounded-xl outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition-all text-slate-900 font-medium text-sm shadow-sm"
               />
             </div>
 
-            <div className="flex items-center justify-between px-1">
-              <label className="flex items-center cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={e => setRememberMe(e.target.checked)}
-                  className="hidden"
-                />
-                <div className={`w-5 h-5 rounded-md border-2 mr-3 flex items-center justify-center transition-all ${rememberMe ? 'bg-brand-600 border-brand-600' : 'bg-slate-50 border-slate-200'}`}>
-                  {rememberMe && (
-                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </div>
-                <span className="text-xs font-bold text-slate-500 group-hover:text-slate-700 transition-colors uppercase tracking-wider">Remember Me</span>
-              </label>
+            <div className="flex items-center gap-3 px-0.5">
+              <button
+                type="button"
+                onClick={() => setRememberMe(!rememberMe)}
+                className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                  rememberMe ? 'bg-brand-600 border-brand-600' : 'bg-white border-slate-300'
+                }`}
+              >
+                {rememberMe && (
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </button>
+              <span className="text-sm text-slate-500 font-medium">Remember me</span>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-slate-950 hover:bg-slate-800 text-white py-4 rounded-2xl font-bold transition-all shadow-xl active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2 group"
+              id="login-submit-btn"
+              className="w-full btn-primary py-3.5 text-base justify-center disabled:opacity-60"
             >
-              {loading ? 'Authenticating...' : 'Sign In'}
-              {!loading && (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Authenticating...
+                </span>
+              ) : (
+                <>Sign In <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg></>
               )}
             </button>
           </form>
 
-          <div className="mt-10 pt-8 border-t border-slate-100 text-center">
-            <p className="text-slate-500 font-medium">
-              Don't have an account? <Link to="/register" className="text-brand-600 font-bold hover:text-brand-700 transition-colors">Create account</Link>
+          <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+            <p className="text-slate-500 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
+              Don't have an account?{' '}
+              <Link to="/register" className="text-brand-600 font-bold hover:text-brand-700 transition-colors">
+                Create account
+              </Link>
             </p>
+          </div>
+
+          <div className="mt-4 text-center">
+            <Link to="/" className="text-slate-400 hover:text-brand-600 text-xs transition-colors">
+              ← Back to home
+            </Link>
           </div>
         </div>
       </div>

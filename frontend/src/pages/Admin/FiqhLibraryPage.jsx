@@ -111,7 +111,7 @@ export default function FiqhLibraryPage() {
                                     <tr key={r.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-colors group">
                                         <td className="px-6 py-4 min-w-[300px]">
                                             <div className="font-bold text-slate-900 dark:text-white mb-1">{r.title}</div>
-                                            <div className="text-xs text-slate-500 line-clamp-1">{r.description}</div>
+                                            <div className="text-xs text-slate-500 line-clamp-1">{r.scholar_reference}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className="px-3 py-1 bg-brand-50 dark:bg-brand-950/30 text-brand-700 dark:text-brand-400 text-xs font-bold rounded-lg border border-brand-100 dark:border-brand-900/30">
@@ -119,7 +119,7 @@ export default function FiqhLibraryPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400 italic">
-                                            {r.scholar_name}
+                                            {r.scholar}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${r.verification_status === 'verified' ? 'bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400' :
@@ -151,7 +151,7 @@ export default function FiqhLibraryPage() {
                             <div key={r.id} className="p-6 space-y-4">
                                 <div>
                                     <div className="font-bold text-slate-900 dark:text-white mb-1">{r.title}</div>
-                                    <div className="text-xs text-slate-500 line-clamp-2">{r.description}</div>
+                                    <div className="text-xs text-slate-500 line-clamp-2">{r.scholar_reference}</div>
                                 </div>
                                 <div className="flex flex-wrap items-center gap-3">
                                     <span className="px-2 py-0.5 bg-brand-50 dark:bg-brand-900/20 text-brand-600 text-[10px] font-bold rounded uppercase">
@@ -162,7 +162,7 @@ export default function FiqhLibraryPage() {
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between pt-2">
-                                    <div className="text-[10px] text-slate-400 italic">By {r.scholar_name}</div>
+                                    <div className="text-[10px] text-slate-400 italic">By {r.scholar}</div>
                                     <div className="flex gap-4">
                                         <button onClick={() => navigate(`/admin/fiqh/edit/${r.id}`)} className="text-brand-600 font-bold text-[10px] uppercase">Edit</button>
                                         <button onClick={() => deleteRuling(r.id)} className="text-red-500 font-bold text-[10px] uppercase">Delete</button>

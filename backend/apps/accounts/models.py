@@ -22,7 +22,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.is_staff or self.is_superuser or self.role != 'member'
+        return self.is_superuser or self.is_staff or self.role in ['super_admin', 'content_admin', 'fiqh_reviewer', 'moderator']
 
     @property
     def is_fiqh_authorized(self):

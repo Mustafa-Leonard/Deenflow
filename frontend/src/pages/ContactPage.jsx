@@ -161,6 +161,7 @@ export default function ContactPage() {
                                         <a href="https://www.facebook.com/leonard.lewa.372" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">Facebook</a>
                                         <a href="https://www.instagram.com/leonardlewa" target="_blank" rel="noopener noreferrer" className="text-xs text-pink-600 hover:underline">Instagram</a>
                                         <a href="https://x.com/leonardlewa" target="_blank" rel="noopener noreferrer" className="text-xs text-slate-600 hover:underline">Twitter/X</a>
+                                        <a href="https://github.com/Mustafa-Leonard" target="_blank" rel="noopener noreferrer" className="text-xs text-slate-900 dark:text-white hover:underline">GitHub</a>
                                     </div>
                                 </div>
                             </div>

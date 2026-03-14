@@ -18,3 +18,11 @@ app.autodiscover_tasks()
 @app.task(bind=True)
 def debug_task(self):
     print(f'Request: {self.request!r}')
+
+# Schedule periodic tasks
+app.conf.beat_schedule = {
+    'check-prayer-alarms-every-minute': {
+        'task': 'worship.prayer.tasks.check_prayer_alarms',
+        'schedule': 60.0,
+    },
+}

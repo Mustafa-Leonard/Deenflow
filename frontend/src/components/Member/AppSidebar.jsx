@@ -3,16 +3,13 @@ import { NavLink } from 'react-router-dom'
 import AuthContext from '../../contexts/AuthContext'
 
 const memberLinkClass = ({ isActive }) =>
-    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden " +
-    (isActive
-        ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-lg shadow-brand-500/30 translate-x-1'
-        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-brand-600 dark:hover:text-brand-400 hover:translate-x-1')
+    "sidebar-link " + (isActive ? 'active' : '')
 
 export default function AppSidebar({ isOpen, setIsOpen }) {
     const { user } = useContext(AuthContext)
 
     return (
-        <aside className={`fixed lg:sticky top-0 left-0 w-72 h-screen bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <aside className={`fixed lg:sticky top-0 left-0 w-64 h-screen bg-white dark:bg-slate-950 border-r border-slate-100 dark:border-slate-800 flex flex-col z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             {/* Branding - Fixed Top */}
             <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50 backdrop-blur-md">
                 <div className="flex items-center gap-2 group cursor-pointer">
@@ -50,30 +47,23 @@ export default function AppSidebar({ isOpen, setIsOpen }) {
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto py-6 px-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 hover:scrollbar-thumb-slate-300 dark:hover:scrollbar-thumb-slate-600">
 
-                {/* User Profile Card */}
-                <div className="mb-8 relative group">
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-500 to-blue-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
-                    <div className="relative p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                <div className="mb-6 relative">
+                    <div className="relative p-4 bg-brand-50 dark:bg-brand-900/20 rounded-xl border border-brand-100 dark:border-brand-800">
                         <div className="flex items-center gap-3">
                             <div className="relative">
-                                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg font-bold text-brand-600 dark:text-brand-400 ring-2 ring-white dark:ring-slate-700 shadow-sm transition-transform group-hover:scale-105">
+                                <div className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-base font-bold text-white shadow-green">
                                     {user?.full_name?.charAt(0) || user?.username?.charAt(0) || 'U'}
                                 </div>
-                                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full animate-pulse"></div>
+                                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-brand-900 rounded-full"></div>
                             </div>
                             <div className="flex-1 min-w-0">
-                                <div className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                                <div className="text-sm font-semibold text-slate-900 dark:text-white truncate font-display">
                                     {user?.full_name || user?.username}
                                 </div>
-                                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
-                                    Knowledge Seeker
+                                <div className="text-xs text-brand-600 dark:text-brand-400 font-medium">
+                                    Member
                                 </div>
                             </div>
-                        </div>
-                        <div className="mt-4 pt-3 border-t border-slate-50 dark:border-slate-800">
-                            <p className="text-[10px] italic text-slate-400 dark:text-slate-500 text-center font-medium leading-relaxed">
-                                "Seek knowledge from the cradle to the grave"
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -106,6 +96,57 @@ export default function AppSidebar({ isOpen, setIsOpen }) {
                     <div>
                         <div className="flex items-center gap-2 px-4 mb-3 opacity-60">
                             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase">
+                                Worship
+                            </span>
+                            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
+                        </div>
+                        <div className="space-y-1">
+                            <NavLink to="/app/worship/dhikr" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">📿</span>
+                                <span className="font-medium tracking-wide">Daily Dhikr</span>
+                            </NavLink>
+                            <NavLink to="/app/worship/tasbih" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">🔢</span>
+                                <span className="font-medium tracking-wide">Digital Tasbih</span>
+                            </NavLink>
+                            <NavLink to="/app/worship/duas" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">🙌</span>
+                                <span className="font-medium tracking-wide">Dua Library</span>
+                            </NavLink>
+                            <NavLink to="/app/worship/quranic-duas" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">📖</span>
+                                <span className="font-medium tracking-wide">Quranic Duas</span>
+                            </NavLink>
+                            <NavLink to="/app/worship/names-of-allah" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">✨</span>
+                                <span className="font-medium tracking-wide">Names of Allah</span>
+                            </NavLink>
+                            <NavLink to="/app/worship/prayer-times" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">⏳</span>
+                                <span className="font-medium tracking-wide">Prayer Times</span>
+                            </NavLink>
+                            <NavLink to="/app/worship/adhan-settings" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">📢</span>
+                                <span className="font-medium tracking-wide">Adhan Settings</span>
+                            </NavLink>
+                            <NavLink to="/app/worship/quran-audio" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">🎧</span>
+                                <span className="font-medium tracking-wide">Quran Audio</span>
+                            </NavLink>
+                            <NavLink to="/app/worship/reminders" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">🔔</span>
+                                <span className="font-medium tracking-wide">Reminders</span>
+                            </NavLink>
+                            <NavLink to="/app/worship/favorites" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">🔖</span>
+                                <span className="font-medium tracking-wide">Favorites</span>
+                            </NavLink>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div className="flex items-center gap-2 px-4 mb-3 opacity-60">
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-widest uppercase">
                                 Personal
                             </span>
                             <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></div>
@@ -126,6 +167,10 @@ export default function AppSidebar({ isOpen, setIsOpen }) {
                             <NavLink to="/app/learning" className={memberLinkClass}>
                                 <span className="text-xl transition-transform duration-300 group-hover:scale-110">🎓</span>
                                 <span className="font-medium tracking-wide">Learning Paths</span>
+                            </NavLink>
+                            <NavLink to="/app/messages" className={memberLinkClass}>
+                                <span className="text-xl transition-transform duration-300 group-hover:scale-110">💌</span>
+                                <span className="font-medium tracking-wide">Messages</span>
                             </NavLink>
                         </div>
                     </div>

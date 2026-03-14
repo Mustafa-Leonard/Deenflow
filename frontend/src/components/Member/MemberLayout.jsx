@@ -35,7 +35,7 @@ export default function MemberLayout() {
             <div className="flex-1 flex flex-col min-w-0">
                 <AppTopbar setIsOpen={setIsSidebarOpen} />
 
-                <main className={`flex-1 pt-20 transition-all duration-500 w-full lg:pl-72`}>
+                <main className={`flex-1 pt-20 transition-all duration-500 w-full lg:pl-64`}>
                     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
                         <Outlet />
                     </div>
