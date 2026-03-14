@@ -1,13 +1,17 @@
 import axios from 'axios'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/+$/, '')
 
 const instance = axios.create({
-  baseURL: API_BASE + '/api',
+  baseURL: API_BASE + '/api/',
   headers: { 'Content-Type': 'application/json' }
 })
 
 instance.interceptors.request.use(cfg => {
+  // Normalize leading slash to ensure it's relative to baseURL (prevents 404s)
+  if (cfg.url && cfg.url.startsWith('/') && cfg.baseURL) {
+    cfg.url = cfg.url.substring(1)
+  }
   const token = localStorage.getItem('access_token')
   if (token) {
     cfg.headers['Authorization'] = 'Bearer ' + token
