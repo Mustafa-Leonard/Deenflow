@@ -17,8 +17,10 @@ def root_view(request):
         "documentation": "/api/health/",
     })
 
+from django.urls import path, include, re_path
+
 urlpatterns = [
-    path('', root_view, name='root'),
+    re_path(r'^$', root_view, name='root'),
     path('admin/', admin.site.urls),
     path('api/health/', health_check, name='health_check'),
     path('api/auth/', include('accounts.urls')),
