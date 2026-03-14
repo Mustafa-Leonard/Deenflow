@@ -6,9 +6,11 @@ def health_check(request):
     return JsonResponse({
         "status": "ok",
         "service": "DeenFlow API",
-        "version": "1.0.4",
-        "timestamp": "2026-03-15T00:40:00Z"
+        "version": "1.0.5",
+        "timestamp": "2026-03-15T01:15:00Z"
     })
+
+handler404 = 'config.error_handlers.custom_404'
 
 def root_view(request):
     return JsonResponse({
