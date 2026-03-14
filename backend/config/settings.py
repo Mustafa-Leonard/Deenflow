@@ -94,6 +94,7 @@ INSTALLED_APPS = [
 # Middleware
 # ---------------------------------------------------------------------------
 MIDDLEWARE = [
+    'config.middleware.RequestLoggingMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
