@@ -396,25 +396,33 @@ def admin_audit_logs(request):
     """List audit logs with filters"""
     from audit.models import AuditLog
     
-    logs = AuditLog.objects.all().order_by('-created_at')
+    logs = AuditLog.objects.all().order_by('-timestamp')
     
     # Optional filters
     action = request.GET.get('action', '')
     if action:
         logs = logs.filter(action__icontains=action)
     
-    user_filter = request.GET.get('user', '')
-    if user_filter:
-        logs = logs.filter(user__email__icontains=user_filter)
+    entity_type_filter = request.GET.get('entity_type', '')
+    if entity_type_filter:
+        logs = logs.filter(entity_type__icontains=entity_type_filter)
+    
+    admin_filter = request.GET.get('admin', '')
+    if admin_filter:
+        from django.db.models import Q
+        logs = logs.filter(Q(admin__email__icontains=admin_filter) | Q(admin__username__icontains=admin_filter))
     
     results = []
     for log in logs[:100]:
         results.append({
             'id': log.id,
-            'user': log.user.email if hasattr(log, 'user') and log.user else 'System',
+            'admin': log.admin.email if log.admin else 'System',
             'action': log.action,
-            'details': log.details if hasattr(log, 'details') else '',
-            'created_at': log.created_at.isoformat(),
+            'entity_type': log.entity_type,
+            'entity_id': log.entity_id,
+            'timestamp': log.timestamp.isoformat(),
+            'previous_data': log.previous_data,
+            'new_data': log.new_data,
         })
     
     return Response({

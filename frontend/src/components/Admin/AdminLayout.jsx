@@ -13,8 +13,8 @@ export default function AdminLayout() {
         setIsSidebarOpen(false)
     }, [location])
 
-    return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300 flex overflow-x-hidden">
+return (
+        <div className="h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300 flex">
             {/* Mobile Sidebar Backdrop */}
             {isSidebarOpen && (
                 <div
@@ -31,9 +31,9 @@ export default function AdminLayout() {
                 {/* Topbar floats above content with sidebar offset on desktop */}
                 <AdminTopbar setIsOpen={setIsSidebarOpen} />
 
-                {/* Page content below fixed topbar */}
-                <main className="flex-1 pt-20 w-full">
-                    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+                {/* Page content below fixed topbar - scrolls internally to stay aligned with sidebar */}
+                <main className="flex-1 mt-20 overflow-y-auto w-full">
+                    <div className="p-4 sm:p-6 lg:p-8 w-full">
                         <Outlet />
                     </div>
                     <Footer />

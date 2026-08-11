@@ -169,7 +169,7 @@ export default function AdminTopbar({ setIsOpen }) {
                                         Super Admin
                                     </div>
                                 </div>
-                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 p-[2px] shadow-sm">
+<div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-500 to-brand-700 p-[2px] shadow-sm">
                                     <div className="w-full h-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center overflow-hidden">
                                         <span className="text-brand-600 font-bold text-xs">
                                             {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'A'}
@@ -189,9 +189,9 @@ export default function AdminTopbar({ setIsOpen }) {
                             {showProfileMenu && (
                                 <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl shadow-slate-200/50 dark:shadow-black/50 border border-slate-200 dark:border-slate-800 overflow-hidden transform origin-top-right">
                                     {/* Account info header */}
-                                    <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-brand-50/60 to-purple-50/30 dark:from-brand-900/20 dark:to-purple-900/10">
+<div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-brand-50/60 to-brand-100/40 dark:from-brand-900/20 dark:to-brand-800/30">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0">
+                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0">
                                                 {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'A'}
                                             </div>
                                             <div className="min-w-0">
@@ -211,7 +211,7 @@ export default function AdminTopbar({ setIsOpen }) {
                                             onClick={() => handleNavigate('/admin/profile')}
                                             className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors group"
                                         >
-                                            <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+<div className="w-8 h-8 rounded-lg bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                                                 👤
                                             </div>
                                             <div>
@@ -225,7 +225,7 @@ export default function AdminTopbar({ setIsOpen }) {
                                             onClick={() => handleNavigate('/admin/settings')}
                                             className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors group"
                                         >
-                                            <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+<div className="w-8 h-8 rounded-lg bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                                                 ⚙️
                                             </div>
                                             <div>

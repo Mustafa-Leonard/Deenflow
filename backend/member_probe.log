@@ -1,0 +1,6 @@
+REGISTER 201
+LOGIN 200
+  member/dashboard-overview/ 200
+  member/stats/ 200
+  member/daily-ayah/ 200
+  admin-as-member (expect 403) 403

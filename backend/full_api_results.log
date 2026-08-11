@@ -1,0 +1,45 @@
+[PASS] Health endpoint
+[FAIL] User registration - no resp - 
+[FAIL] User login - no resp
+[FAIL] User profile (auth) - no resp
+[FAIL] Member dashboard (auth) - no resp
+[FAIL] Member stats (auth) - no resp
+[FAIL] Daily ayah (auth) - no resp
+[FAIL] Admin endpoint unauth user blocked (403) - no resp
+[PASS] Admin login
+[PASS] Admin login returns is_admin user
+[PASS] Admin admin dashboard stats
+[PASS] Admin admin dashboard recent-activity
+[PASS] Admin admin dashboard pending-reviews
+[PASS] Admin admin dashboard top-topics
+[PASS] Admin admin dashboard health
+[PASS] Admin admin dashboard overview
+[PASS] Admin admin users
+[PASS] Admin admin ai logs
+[PASS] Admin admin ai flagged
+[PASS] Admin admin ai-config
+[PASS] Admin admin scholars
+[PASS] Admin admin roles
+[PASS] Admin admin permissions
+[PASS] Admin admin moderation reports
+[PASS] Admin admin categories
+[PASS] Admin admin tags
+[PASS] Admin admin content
+[PASS] Admin admin analytics questions-per-day
+[PASS] Admin admin analytics ai-flag-rate
+[PASS] Admin admin analytics active-users
+[PASS] Admin admin audit-logs
+[PASS] CORS preflight from 5173
+[PASS] Admin users list returns real DB data
+[PASS] DB users present in list
+
+============================================================
+SUMMARY: 27 passed, 7 failed, 34 total
+  FAILED: User registration - no resp - 
+  FAILED: User login - no resp
+  FAILED: User profile (auth) - no resp
+  FAILED: Member dashboard (auth) - no resp
+  FAILED: Member stats (auth) - no resp
+  FAILED: Daily ayah (auth) - no resp
+  FAILED: Admin endpoint unauth user blocked (403) - no resp
+============================================================

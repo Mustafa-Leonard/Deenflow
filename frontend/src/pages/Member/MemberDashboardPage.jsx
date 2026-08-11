@@ -38,17 +38,13 @@ export default function MemberDashboardPage() {
 
     const fetchDashboardData = async () => {
         try {
-            const [overviewRes, topicsRes, extrasRes] = await Promise.all([
-                api.get('/auth/dashboard/overview/'),
-                api.get('/academy/topics/suggested/'),
-                api.get('/auth/dashboard/extras/')
-            ])
+            const overviewRes = await api.get('/auth/member/dashboard-overview/')
 
             setStats(overviewRes.data.stats)
-            setRecentQuestions(overviewRes.data.recent_questions)
-            setDailyAyah(overviewRes.data.daily_ayah)
-            setSuggestedTopics(topicsRes.data)
-            setExtras(extrasRes.data)
+            setRecentQuestions(overviewRes.data.questions)
+            setDailyAyah(overviewRes.data.ayah)
+            setSuggestedTopics(overviewRes.data.topics)
+            setExtras(overviewRes.data.extras)
         } catch (error) {
             console.error('Failed to fetch dashboard data:', error)
         } finally {
@@ -66,7 +62,7 @@ export default function MemberDashboardPage() {
     }
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto pb-12">
+        <div className="space-y-8 w-full pb-12">
             {/* Welcome Banner */}
             <div className="relative overflow-hidden rounded-3xl p-8 md:p-12 text-white shadow-xl mosque-hero-bg">
                 <div className="absolute inset-0 bg-brand-900/60 backdrop-blur-[2px]"></div>

@@ -36,11 +36,31 @@
     line-height: 1.2;
   }
 
-  /* ─── THEME-SENSITIVE ELEMENTS ─────────────────────────────────────── */
+/* ─── THEME-SENSITIVE ELEMENTS ─────────────────────────────────────── */
+  /*
+    Theme transitions are intentionally LIMITED to color/opacity/box-shadow.
+    We deliberately EXCLUDE layout-affecting properties (width, height,
+    margin, padding, transform, grid/flex) so toggling dark/light NEVER
+    causes the page to collapse, shift, or reflow. This keeps the app-shell
+    firm and stable during theme changes.
+  */
   *,
   *::before,
   *::after {
     transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Layout-critical containers must NEVER animate layout on theme change.
+     This overrides any transform/position animations on the app shell. */
+  header,
+  aside,
+  main,
+  .fixed,
+  .sticky,
+  #root > div {
+    transition-property: background-color, border-color, color, box-shadow, opacity;
     transition-duration: 200ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -184,6 +204,31 @@ body,
 
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out both;
+}
+
+/* Page transition — stable fade (opacity only, no scale/translate to avoid collapse) */
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Tailwind's `animate-in fade-in` placeholders are not defined utilities;
+   map them to a stable opacity-only fade so pages feel firm on navigation. */
+.animate-in,
+.page-transition {
+  animation: pageFadeIn 0.35s ease-out both;
+}
+
+.fade-in {
+  animation: pageFadeIn 0.35s ease-out both;
+}
+
+/* Remove any lingering translate-based entrance that can read as "collapse" */
+.slide-in-from-top-4,
+.slide-in-from-bottom-4,
+.slide-in-from-left-4,
+.slide-in-from-right-4 {
+  animation: pageFadeIn 0.35s ease-out both;
 }
 
 .anim-delay-100 { animation-delay: 0.1s; }

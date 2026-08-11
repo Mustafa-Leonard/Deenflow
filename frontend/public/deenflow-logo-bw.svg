@@ -1,43 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none">
-  <!-- ===== B&W VERSION for print ===== -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 96" fill="none">
+  <!-- B&W version for print/light backgrounds -->
 
-  <!-- Crescent D shape -->
-  <path d="M 10 10 L 10 70 Q 10 70 40 70 Q 72 70 72 40 Q 72 10 40 10 Z"
-    fill="#1a1a1a"/>
-
-  <!-- Inner cutout -->
-  <path d="M 22 20 L 22 60 Q 22 60 38 60 Q 60 60 60 40 Q 60 20 38 20 Z"
-    fill="white"/>
-
-  <!-- Crescent bite -->
-  <ellipse cx="30" cy="40" rx="14" ry="20" fill="white"/>
-
-  <!-- Flowing lines (white on dark) -->
-  <path d="M 14 30 Q 20 28 18 35 Q 16 42 22 40" stroke="white" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.8"/>
-  <path d="M 12 40 Q 19 38 17 46 Q 15 52 21 50" stroke="white" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.8"/>
-  <path d="M 15 22 Q 22 20 20 28" stroke="white" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.6"/>
-  <path d="M 13 52 Q 20 50 19 57" stroke="white" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.6"/>
-
-  <!-- Star -->
-  <g transform="translate(44, 6)">
-    <polygon points="5,0 6.2,3.8 10,3.8 7,6.1 8.1,10 5,7.8 1.9,10 3,6.1 0,3.8 3.8,3.8"
-      fill="white"/>
+  <!-- Brand mark -->
+  <g transform="translate(4,4)">
+    <rect width="88" height="88" rx="24" fill="#1B5E20" />
+    <rect x="8" y="8" width="72" height="72" rx="18" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" />
+    <g transform="translate(44,44)">
+      <rect x="-25" y="-7.5" width="50" height="15" rx="7.5" fill="#ffffff" opacity="0.95"/>
+      <rect x="-25" y="-7.5" width="50" height="15" rx="7.5" fill="#ffffff" opacity="0.95" transform="rotate(90)"/>
+      <circle r="11" fill="#1B5E20" opacity="0.9"/>
+      <circle r="6.5" fill="#ffffff"/>
+    </g>
+    <path d="M 60 58 A 11 11 0 1 0 60 80 A 8.5 8.5 0 1 1 60 58 Z" fill="#ffffff" opacity="0.98"/>
   </g>
 
-  <!-- Wordmark in black -->
-  <text x="84" y="52"
-    font-family="'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif"
-    font-size="34" font-weight="700" letter-spacing="-0.5"
+  <!-- Wordmark -->
+  <text x="106" y="52"
+    font-family="'Poppins','Inter','Segoe UI',Arial,sans-serif"
+    font-size="40" font-weight="800" letter-spacing="-1"
     fill="#1a1a1a">Deen</text>
-
-  <text x="192" y="52"
-    font-family="'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif"
-    font-size="34" font-weight="300" letter-spacing="-0.5"
+  <text x="224" y="52"
+    font-family="'Poppins','Inter','Segoe UI',Arial,sans-serif"
+    font-size="40" font-weight="700" letter-spacing="-1"
     fill="#1a1a1a">Flow</text>
 
   <!-- Tagline -->
-  <text x="85" y="66"
-    font-family="'Segoe UI', 'Inter', Arial, sans-serif"
-    font-size="9" font-weight="500" letter-spacing="2.5"
+  <text x="107" y="72"
+    font-family="'Inter','Segoe UI',Arial,sans-serif"
+    font-size="10.5" font-weight="600" letter-spacing="3"
     fill="#555" opacity="0.8">ISLAMIC GUIDANCE PLATFORM</text>
 </svg>

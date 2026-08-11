@@ -65,11 +65,12 @@ def run_setup():
     except Exception as e:
         logger.error(f"MIGRATION FAILED: {e}")
 
-    # 5. Create/Update Admin
+    # 5. Create/Update Primary Admin — SINGLE SUPER ADMIN POLICY
     try:
         User = get_user_model()
-        email = os.environ.get('ADMIN_EMAIL', 'leonardlewa372@gmail.com')
-        password = os.environ.get('ADMIN_PASSWORD', 'leonard%372')
+        # The ONE and ONLY super admin account. All other users stay members.
+        email = os.environ.get('ADMIN_EMAIL', 'admin@deenflow.com')
+        password = os.environ.get('ADMIN_PASSWORD', 'Admin@12345')
         
         user, created = User.objects.get_or_create(email=email, defaults={'username': email})
         user.set_password(password)
@@ -79,10 +80,19 @@ def run_setup():
         user.save()
         
         if created:
-            logger.info(f"Admin account CREATED: {email}")
+            logger.info(f"Primary admin account CREATED: {email}")
         else:
-            logger.info(f"Admin account UPDATED (Password Reset): {email}")
-            
+            logger.info(f"Primary admin account UPDATED (Password Reset): {email}")
+
+        # ENFORCE single-superadmin: any OTHER superuser becomes a regular member.
+        other_su = User.objects.filter(is_superuser=True).exclude(pk=user.pk)
+        for u in other_su:
+            logger.warning(f"[SECURITY] Demoting extra superuser to member: {u.username}")
+            u.is_superuser = False
+            u.is_staff = False
+            u.role = 'member'
+            u.save()
+
     except Exception as e:
         logger.error(f"ADMIN SETUP FAILED: {e}")
 

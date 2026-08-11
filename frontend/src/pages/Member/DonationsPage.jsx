@@ -19,6 +19,12 @@ export default function DonationsPage() {
     const [campaigns, setCampaigns] = useState([])
     const [wallet, setWallet] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [showMpesa, setShowMpesa] = useState(false)
+    const [mpesaPhone, setMpesaPhone] = useState('')
+    const [mpesaAmount, setMpesaAmount] = useState('')
+    const [mpesaLoading, setMpesaLoading] = useState(false)
+    const [mpesaError, setMpesaError] = useState('')
+    const [mpesaSuccess, setMpesaSuccess] = useState('')
 
     useEffect(() => {
         if (import.meta.env.VITE_PAYMENTS_ENABLED !== 'true') {
@@ -65,14 +71,35 @@ export default function DonationsPage() {
         }
     }
 
-    const handleDeposit = async () => {
-        const amount = prompt('Enter amount to deposit into your Zakat/Sadaqah wallet ($):')
-        if (!amount || isNaN(amount)) return
+const handleDeposit = () => {
+        setMpesaError('')
+        setMpesaSuccess('')
+        setShowMpesa(true)
+    }
+
+    const handleMpesaDeposit = async () => {
+        if (!mpesaPhone || !mpesaAmount || isNaN(mpesaAmount) || parseFloat(mpesaAmount) <= 0) {
+            setMpesaError('Please enter a valid amount and your M-Pesa phone number.')
+            return
+        }
+        setMpesaLoading(true)
+        setMpesaError('')
+        setMpesaSuccess('')
         try {
-            await api.post('/donations/wallet/deposit/', { amount: parseFloat(amount) })
+            const res = await api.post('/donations/wallet/mpesa_deposit/', {
+                amount: parseFloat(mpesaAmount),
+                phone: mpesaPhone
+            })
+            setShowMpesa(false)
+            setMpesaPhone('')
+            setMpesaAmount('')
+            setMpesaSuccess(`M-Pesa prompt sent to ${mpesaPhone}. Confirm the payment on your phone (KSh ${res.data.amount}).`)
             fetchData()
         } catch (error) {
-            alert('Deposit failed')
+            console.error('M-Pesa deposit failed:', error)
+            setMpesaError(error.response?.data?.error || 'M-Pesa deposit failed. Please try again.')
+        } finally {
+            setMpesaLoading(false)
         }
     }
 
@@ -86,7 +113,7 @@ export default function DonationsPage() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-12 pb-24 animate-in fade-in duration-700">
+        <div className="w-full space-y-12 pb-24 animate-in fade-in duration-700">
             {/* Header / Wallet Section */}
             <div className="relative overflow-hidden rounded-[3rem] p-12 text-white shadow-2xl mosque-hero-bg group">
                 <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-[2px]"></div>
@@ -282,7 +309,7 @@ export default function DonationsPage() {
                             )}
                         </div>
 
-                        {/* Automatic Zakat CTA */}
+{/* Automatic Zakat CTA */}
                         <div className="deen-card p-8 bg-emerald-900 text-white overflow-hidden relative group shadow-2xl">
                             <div className="absolute inset-0 bg-brand-500/5 islamic-accent pointer-events-none opacity-50"></div>
                             <div className="relative z-10 flex gap-5">
@@ -300,6 +327,75 @@ export default function DonationsPage() {
                     </div>
                 </div>
             </div>
+
+            {/* M-Pesa toasts */}
+            {mpesaError && (
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-red-600 text-white px-6 py-4 rounded-2xl shadow-2xl text-sm font-bold max-w-md text-center">
+                    {mpesaError}
+                </div>
+            )}
+            {mpesaSuccess && (
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-brand-600 text-white px-6 py-4 rounded-2xl shadow-2xl text-sm font-bold max-w-md text-center">
+                    {mpesaSuccess}
+                </div>
+            )}
+
+            {/* M-Pesa Deposit Modal */}
+            {showMpesa && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowMpesa(false)} />
+                    <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-8 w-full max-w-md">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-display font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <span className="text-2xl">📱</span> Add Funds via M-Pesa
+                            </h3>
+                            <button onClick={() => setShowMpesa(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-2xl leading-none">&times;</button>
+                        </div>
+
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                            Enter the amount and your M-Pesa phone number. We'll send an STK push prompt to your phone to top up your Zakat/Sadaqah wallet.
+                        </p>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Amount (KES)</label>
+                                <input
+                                    type="number"
+                                    value={mpesaAmount}
+                                    onChange={e => setMpesaAmount(e.target.value)}
+                                    placeholder="e.g. 500"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 text-lg font-bold text-slate-900 dark:text-white transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">M-Pesa Phone Number</label>
+                                <input
+                                    type="tel"
+                                    value={mpesaPhone}
+                                    onChange={e => setMpesaPhone(e.target.value)}
+                                    placeholder="0712 345 678"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 text-lg font-bold text-slate-900 dark:text-white transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={handleMpesaDeposit}
+                            disabled={mpesaLoading}
+                            className="w-full mt-6 bg-brand-600 hover:bg-brand-700 text-white py-4 rounded-2xl font-bold transition-all shadow-lg shadow-brand-600/30 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                            {mpesaLoading ? (
+                                <>
+                                    <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                                    Sending prompt...
+                                </>
+                            ) : (
+                                'Send M-Pesa Prompt'
+                            )}
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -20,7 +20,7 @@ export default function AppTopbar({ setIsOpen }) {
 
     return (
         <header className="fixed top-0 right-0 left-0 lg:left-64 h-20 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-40 transition-all duration-300 shadow-sm">
-            <div className="h-full px-4 sm:px-8 flex items-center justify-between max-w-7xl mx-auto w-full gap-4">
+            <div className="h-full px-4 sm:px-8 flex items-center justify-between w-full gap-4">
 
                 {/* Mobile Menu Toggle */}
                 <button

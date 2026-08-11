@@ -18,11 +18,13 @@ export default function Header() {
   return (
     <header className="flex items-center justify-between px-8 py-5 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl fixed w-full z-50 border-b border-slate-100 dark:border-slate-800/50 shadow-sm transition-all duration-300">
       <div className="flex items-center gap-12">
-        {/* Brand */}
+{/* Brand */}
         <div className="flex items-center gap-4 group cursor-pointer" onClick={() => window.location.href = '/app/dashboard'}>
-          <div className="w-10 h-10 bg-brand-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-brand-600/30 group-hover:rotate-12 transition-transform">
-             <Sparkles className="w-6 h-6 fill-current" />
-          </div>
+          <img
+            src="/deenflow-icon.svg"
+            alt="DeenFlow Icon"
+            className="w-10 h-10 flex-shrink-0 drop-shadow-xl group-hover:scale-105 transition-transform"
+          />
           <div className="flex flex-col">
             <div className="font-display font-bold text-2xl tracking-tighter text-slate-950 dark:text-white leading-none">
               Deen<span className="text-brand-600">Flow</span>

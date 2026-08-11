@@ -1,0 +1,2 @@
+STATUS 201
+BODY {"user":{"id":25,"username":"probe_1786216559@test.com","email":"probe_1786216559@test.com","full_name":"Probe User","theme":"light","role":"member","madhhab":"hanafi","is_admin":false},"access":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg2MjE3NDYzLCJpYXQiOjE3ODYyMTY1NjMsImp0aSI6IjQ1ZDY4NGM0ODI0ZTQ2ZDA5MzBjOWQ4NmRhYjEyNjcxIiwidXNlcl9pZCI6IjI1In0.6pPcuGtQQB4Kgoc

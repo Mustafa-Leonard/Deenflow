@@ -7,9 +7,9 @@ import { NotificationProvider } from './contexts/NotificationContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
 
-// Loading component for Suspense
+// Loading component for Suspense — lightweight fixed overlay to avoid page collapse
 const PageLoader = () => (
-  <div className="flex flex-col items-center justify-center min-h-screen bg-white dark:bg-slate-950">
+  <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/85 dark:bg-slate-950/85 backdrop-blur-sm">
     <div className="w-12 h-12 border-4 border-slate-200 dark:border-slate-800 border-t-brand-600 rounded-full animate-spin"></div>
     <div className="mt-4 text-slate-500 dark:text-slate-400 font-medium animate-pulse">Loading DeenFlow...</div>
   </div>
@@ -90,6 +90,9 @@ const AnalyticsPage = lazy(() => import('./pages/Admin/AnalyticsPage'))
 const AdminMessagingPage = lazy(() => import('./pages/Admin/AdminMessagingPage'))
 const AdminWorshipPage = lazy(() => import('./pages/Admin/AdminWorshipPage'))
 const MessagesPage = lazy(() => import('./pages/Member/MessagesPage'))
+const CommunityPage = lazy(() => import('./pages/CommunityPage'))
+const MarketplacePage = lazy(() => import('./pages/MarketplacePage'))
+const ActivityPage = lazy(() => import('./pages/ActivityPage'))
 
 
 function HomeRedirect() {
@@ -203,11 +206,11 @@ export default function App() {
 
                 <Route path="donations" element={<DonationsPage />} />
                 <Route path="consultation" element={<ConsultationsPage />} />
-                <Route path="marketplace" element={<div className="p-8">Islamic Marketplace - Coming Soon</div>} />
+                <Route path="marketplace" element={<MarketplacePage />} />
 
-                <Route path="community" element={<div className="p-8 text-slate-600 dark:text-slate-400">Community - Coming Soon</div>} />
+                <Route path="community" element={<CommunityPage />} />
                 <Route path="community/mine" element={<div className="p-8 text-slate-600 dark:text-slate-400">My Posts - Coming Soon</div>} />
-                <Route path="activity" element={<div className="p-8 text-slate-600 dark:text-slate-400">Activity - Coming Soon</div>} />
+                <Route path="activity" element={<ActivityPage />} />
                 <Route path="notifications" element={<NotificationsPage />} />
                 <Route path="messages" element={<MessagesPage />} />
 

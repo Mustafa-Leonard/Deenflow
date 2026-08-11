@@ -125,7 +125,7 @@ export default function UsersListPage() {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto pb-20">
+        <div className="space-y-8 animate-in fade-in duration-500 w-full pb-20">
             {/* Header */}
             <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
                 <div>

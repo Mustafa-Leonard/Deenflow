@@ -1,0 +1,11 @@
+worship/prayer/times/ -> STATUS=400
+worship/prayer/location/ -> OK
+worship/prayer/preferences/ -> OK
+worship/dhikr/ -> OK
+worship/reminders/ -> OK
+worship/favorites/ -> OK
+worship/categories/ -> OK
+worship/quran/ -> STATUS=404
+worship/translations/ -> STATUS=404
+worship/duas/ -> OK
+worship/asmaul-husna/ -> OK

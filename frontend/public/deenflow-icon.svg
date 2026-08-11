@@ -1,41 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" fill="none">
   <defs>
-    <linearGradient id="crescentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#2E7D32;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#FFD700;stop-opacity:1" />
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#27a06d" />
+      <stop offset="50%" style="stop-color:#1a8f5c" />
+      <stop offset="100%" style="stop-color:#0d3d26" />
     </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5d06f" />
+      <stop offset="100%" style="stop-color:#d4a637" />
+    </linearGradient>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
       <feMerge>
-        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
   </defs>
 
-  <!-- Background circle (optional, remove for transparent) -->
-  <!-- <circle cx="40" cy="40" r="40" fill="#F0F7F0"/> -->
+  <!-- Rounded-square brand tile -->
+  <rect x="2" y="2" width="92" height="92" rx="24" fill="url(#brandGrad)" />
 
-  <!-- Crescent D shape -->
-  <path d="M 8 8 L 8 72 Q 8 72 40 72 Q 74 72 74 40 Q 74 8 40 8 Z"
-    fill="url(#crescentGrad)" filter="url(#glow)"/>
+  <!-- Subtle inner ring -->
+  <rect x="10" y="10" width="76" height="76" rx="19" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1.5" />
 
-  <!-- Inner white cutout -->
-  <path d="M 22 20 L 22 60 Q 22 60 38 60 Q 60 60 60 40 Q 60 20 38 20 Z"
-    fill="white"/>
+  <!-- Modern 8-pointed Islamic star (Rub el Hizb) -->
+  <g transform="translate(48,48)">
+    <!-- Two overlapping squares form the 8-point star -->
+    <rect x="-26" y="-8" width="52" height="16" rx="8" fill="url(#goldGrad)" opacity="0.95"/>
+    <rect x="-26" y="-8" width="52" height="16" rx="8" fill="url(#goldGrad)" opacity="0.95" transform="rotate(90)"/>
+    <!-- Inner star core -->
+    <circle r="12" fill="#0d3d26" opacity="0.9"/>
+    <circle r="7" fill="url(#goldGrad)"/>
+  </g>
 
-  <!-- Crescent bite -->
-  <ellipse cx="30" cy="40" rx="14" ry="22" fill="white"/>
-
-  <!-- Flowing spiritual lines inside crescent -->
-  <path d="M 12 28 Q 20 25 17 34 Q 14 43 22 40" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.95"/>
-  <path d="M 10 42 Q 18 39 15 49 Q 12 57 20 54" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.95"/>
-  <path d="M 13 18 Q 21 15 18 24" stroke="#FFD700" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.75"/>
-  <path d="M 11 56 Q 19 53 17 62" stroke="#FFD700" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.75"/>
-
-  <!-- Star above -->
-  <g transform="translate(46, 4)" filter="url(#glow)">
-    <polygon points="6,0 7.4,4.5 12,4.5 8.3,7.3 9.7,12 6,9.3 2.3,12 3.7,7.3 0,4.5 4.6,4.5"
-      fill="#FFD700"/>
+  <!-- Crescent moon overlapping the star lower-right -->
+  <g transform="translate(63,63)">
+    <path
+      d="M 0 -12 A 12 12 0 1 0 0 12 A 9.5 9.5 0 1 1 0 -12 Z"
+      fill="#ffffff"
+      opacity="0.98"
+      filter="url(#softGlow)"
+    />
   </g>
 </svg>

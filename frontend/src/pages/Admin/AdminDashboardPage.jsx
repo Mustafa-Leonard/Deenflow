@@ -37,10 +37,10 @@ export default function AdminDashboardPage() {
         try {
             const res = await api.get('/auth/admin/dashboard/overview/')
             const data = res.data
-            setStats(data.stats)
-            setRecentActivity(data.activity)
-            setPendingReviews(data.reviews)
-            setTopTopics(data.topics)
+            setStats(res.data.stats)
+            setRecentActivity(res.data.activity)
+            setPendingReviews(res.data.reviews)
+            setTopTopics(res.data.topics)
         } catch (error) {
             console.error('Failed to fetch dashboard data:', error)
         } finally {
@@ -75,7 +75,7 @@ export default function AdminDashboardPage() {
     }
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto pb-12">
+        <div className="space-y-8 w-full pb-12">
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4">
                 <div>

@@ -82,7 +82,7 @@ export default function ConsultationsPage() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-12 pb-24 animate-in fade-in duration-700">
+        <div className="w-full space-y-12 pb-24 animate-in fade-in duration-700">
             {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 py-4 px-2">
                 <div>

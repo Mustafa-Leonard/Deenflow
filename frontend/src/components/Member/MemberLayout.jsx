@@ -19,8 +19,8 @@ export default function MemberLayout() {
         return <Navigate to="/admin/dashboard" replace />
     }
 
-    return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500 flex overflow-x-hidden">
+return (
+        <div className="h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-500 flex">
             {/* Mobile Sidebar Backdrop */}
             {isSidebarOpen && (
                 <div
@@ -35,8 +35,8 @@ export default function MemberLayout() {
             <div className="flex-1 flex flex-col min-w-0">
                 <AppTopbar setIsOpen={setIsSidebarOpen} />
 
-                <main className={`flex-1 pt-20 transition-all duration-500 w-full lg:pl-64`}>
-                    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+                <main className="flex-1 mt-20 overflow-y-auto w-full transition-all duration-500">
+                    <div className="p-4 sm:p-6 lg:p-8 w-full">
                         <Outlet />
                     </div>
                     <Footer />

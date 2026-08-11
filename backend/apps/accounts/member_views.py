@@ -2,9 +2,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.db.models import Count
-from datetime import datetime, timedelta
+from django.utils import timezone
 from .models import User
 from questions.models import Question
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -13,26 +14,26 @@ def member_stats(request):
     user = request.user
     from answers.models import SavedAnswer
     from spiritual_intelligence_service.models import Streak, DailyInsight
-    
+
     # Calculate stats
     total_questions = Question.objects.filter(user=user).count()
     saved_items = SavedAnswer.objects.filter(user=user).count()
-    
+
     # Get latest streaks
     salah_streak = Streak.objects.filter(user=user, category='Daily Prayer').first()
     salah_streak_val = salah_streak.current_count if salah_streak else 0
-    
+
     # Calculate learning progress from actual UserProgress
     from learning.models import UserProgress, Lesson
     progress_count = UserProgress.objects.filter(user=user).count()
     total_lessons = Lesson.objects.count()
     learning_progress = (progress_count / total_lessons * 100) if total_lessons > 0 else 0
-    
+
     return Response({
         'totalQuestions': total_questions,
         'savedItems': saved_items,
         'learningProgress': round(learning_progress, 1),
-        'communityParticipation': 150, # Mock
+        'communityParticipation': 150,  # Mock
         'salahStreak': salah_streak_val
     })
 
@@ -43,7 +44,7 @@ def daily_ayah(request):
     """Get daily Ayah from the database"""
     from quran.models import Ayah
     import random
-    
+
     # Try to get a random ayah from the first 3 surahs for better quality daily snippets
     ayahs = Ayah.objects.filter(surah__number__lte=3)
     if ayahs.exists():
@@ -55,13 +56,14 @@ def daily_ayah(request):
             'reference': f"Surah {ayah.surah.name_english} {ayah.surah.number}:{ayah.ayah_number_in_surah}",
             'surah_number': ayah.surah.number
         })
-    
+
     return Response({
         'arabic': 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
         'translation': 'In the name of Allah, the Most Gracious, the Most Merciful',
         'reference': 'Quran 1:1',
         'surah_number': 1
     })
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -76,6 +78,7 @@ def suggested_topics(request):
         {'name': 'Islamic History', 'slug': 'islamic-history', 'icon': '🏛️', 'lessons_count': 20}
     ]
     return Response(topics)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -93,6 +96,7 @@ def member_recent_questions(request):
         })
     return Response(results)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def member_dashboard_extras(request):
@@ -100,11 +104,11 @@ def member_dashboard_extras(request):
     user = request.user
     from donations.models import Wallet, Campaign
     from consultation.models import ConsultationSession
-    
+
     wallet, _ = Wallet.objects.get_or_create(user=user)
-    upcoming_session = ConsultationSession.objects.filter(member=user, status='confirmed', scheduled_at__gte=datetime.now()).first()
+    upcoming_session = ConsultationSession.objects.filter(member=user, status='confirmed', scheduled_at__gte=timezone.now()).first()
     featured_campaign = Campaign.objects.filter(is_active=True).first()
-    
+
     return Response({
         'walletBalance': wallet.balance,
         'upcomingSession': {
@@ -116,6 +120,8 @@ def member_dashboard_extras(request):
             'progress': float((featured_campaign.current_amount / featured_campaign.target_amount) * 100) if featured_campaign and featured_campaign.target_amount > 0 else 0
         } if featured_campaign else None
     })
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def member_dashboard_overview(request):
@@ -128,7 +134,7 @@ def member_dashboard_overview(request):
     from donations.models import Wallet, Campaign
     from consultation.models import ConsultationSession
     import random
-    
+
     # 1. Stats
     total_questions = Question.objects.filter(user=user).count()
     saved_items = SavedAnswer.objects.filter(user=user).count()
@@ -137,7 +143,7 @@ def member_dashboard_overview(request):
     progress_count = UserProgress.objects.filter(user=user).count()
     total_lessons = Lesson.objects.count()
     learning_progress = (progress_count / total_lessons * 100) if total_lessons > 0 else 0
-    
+
     # 2. Recent Questions
     recent_qs = Question.objects.filter(user=user).order_by('-created_at')[:5]
     questions_list = [{
@@ -147,7 +153,7 @@ def member_dashboard_overview(request):
         'status': q.status,
         'category': 'General'
     } for q in recent_qs]
-    
+
     # 3. Daily Ayah
     ayahs = Ayah.objects.filter(surah__number__lte=3)
     if ayahs.exists():
@@ -166,12 +172,12 @@ def member_dashboard_overview(request):
             'reference': 'Quran 1:1',
             'surah_number': 1
         }
-        
+
     # 4. Extras
     wallet, _ = Wallet.objects.get_or_create(user=user)
-    upcoming_session = ConsultationSession.objects.filter(member=user, status='confirmed', scheduled_at__gte=datetime.now()).first()
+    upcoming_session = ConsultationSession.objects.filter(member=user, status='confirmed', scheduled_at__gte=timezone.now()).first()
     featured_campaign = Campaign.objects.filter(is_active=True).first()
-    
+
     # 5. Suggested Topics (Stateless for now)
     topics = [
         {'name': 'Introduction to Tafsir', 'slug': 'intro-tafsir', 'icon': '📖', 'lessons_count': 12},

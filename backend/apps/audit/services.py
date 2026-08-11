@@ -1,5 +1,6 @@
 from .models import AuditLog
 
+
 class AuditService:
     @staticmethod
     def log_action(admin, entity_type, entity_id, action, previous_data=None, new_data=None, request=None):
@@ -22,7 +23,5 @@ class AuditService:
             action=action,
             admin=admin,
             previous_data=previous_data,
-            new_data=new_data,
-            ip_address=ip,
-            user_agent=ua
+            new_data=new_data
         )

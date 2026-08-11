@@ -55,10 +55,12 @@ export default function Footer() {
 
           {/* Brand & Mission */}
           <div className="lg:col-span-4 space-y-10">
-            <div className="flex items-center gap-4 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-              <div className="w-12 h-12 bg-brand-600 rounded-2xl flex items-center justify-center text-white shadow-2xl shadow-brand-600/20 group-hover:rotate-12 transition-transform">
-                <Sparkles className="w-7 h-7 fill-current" />
-              </div>
+<div className="flex items-center gap-4 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              <img
+                src="/deenflow-icon.svg"
+                alt="DeenFlow Icon"
+                className="w-12 h-12 flex-shrink-0 drop-shadow-xl group-hover:scale-105 transition-transform"
+              />
               <div className="flex flex-col">
                 <div className="font-display font-bold text-3xl tracking-tighter text-white leading-none">
                   Deen<span className="text-brand-600">Flow</span>

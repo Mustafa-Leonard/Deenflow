@@ -20,6 +20,11 @@ import {
 export default function UpgradePage() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
+    const [phone, setPhone] = useState('')
+    const [showMpesa, setShowMpesa] = useState(false)
+    const [selectedTier, setSelectedTier] = useState(null)
+    const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
 
     React.useEffect(() => {
         if (import.meta.env.VITE_PAYMENTS_ENABLED !== 'true') {
@@ -73,12 +78,30 @@ export default function UpgradePage() {
         }
     ]
 
-    const handleUpgrade = async (tierId) => {
+const handleUpgrade = async (tierId) => {
         if (tierId === 'free') return
+        setError('')
+        setSuccess('')
+        setSelectedTier(tierId)
+        setShowMpesa(true)
+    }
 
+    const handleMpesaPay = async () => {
+        if (!selectedTier || !phone) {
+            setError('Please enter your M-Pesa phone number.')
+            return
+        }
         setLoading(true)
+        setError('')
+        setSuccess('')
         try {
-            const res = await api.post('/billing/my-subscription/subscribe/', { tier: tierId })
+            const res = await api.post('/billing/my-subscription/mpesa_pay/', {
+                tier: selectedTier,
+                phone
+            })
+
+            setShowMpesa(false)
+            setSuccess(`M-Pesa prompt sent to ${phone}. Confirm the payment on your phone (KSh ${res.data.amount}).`)
 
             const saved = localStorage.getItem('user')
             if (saved) {
@@ -86,15 +109,9 @@ export default function UpgradePage() {
                 userObj.subscription = res.data.tier
                 localStorage.setItem('user', JSON.stringify(userObj))
             }
-
-            if (res.data.checkoutUrl) {
-                window.location.href = res.data.checkoutUrl
-            } else {
-                navigate('/app/dashboard')
-                window.location.reload()
-            }
         } catch (error) {
-            console.error('Upgrade failed:', error)
+            console.error('M-Pesa payment failed:', error)
+            setError(error.response?.data?.error || 'M-Pesa payment failed. Please try again.')
         } finally {
             setLoading(false)
         }
@@ -203,10 +220,78 @@ export default function UpgradePage() {
                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
                 </div>
                 
-                <p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] font-display">
+<p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] font-display">
                     Ensuring Halaal Transactions Globally
                 </p>
+
+                {/* M-Pesa payment method note */}
+                <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8">
+                    <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                        <span className="text-2xl">📱</span>
+                        <div>
+                            <div className="text-sm font-bold text-slate-900 dark:text-white">M-Pesa (Lipa na M-Pesa)</div>
+                            <div className="text-xs text-slate-500">Pay securely via Safaricom M-Pesa STK Push</div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            {/* Error / Success toasts */}
+            {error && (
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-red-600 text-white px-6 py-4 rounded-2xl shadow-2xl text-sm font-bold max-w-md text-center">
+                    {error}
+                </div>
+            )}
+            {success && (
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-brand-600 text-white px-6 py-4 rounded-2xl shadow-2xl text-sm font-bold max-w-md text-center">
+                    {success}
+                </div>
+            )}
+
+            {/* M-Pesa Payment Modal */}
+            {showMpesa && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowMpesa(false)} />
+                    <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-8 w-full max-w-md">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-display font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <span className="text-2xl">📱</span> Pay with M-Pesa
+                            </h3>
+                            <button onClick={() => setShowMpesa(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-2xl leading-none">&times;</button>
+                        </div>
+
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                            Enter your M-Pesa phone number. We'll send an STK push prompt to your phone to complete the payment.
+                        </p>
+
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                            M-Pesa Phone Number
+                        </label>
+                        <input
+                            type="tel"
+                            value={phone}
+                            onChange={e => setPhone(e.target.value)}
+                            placeholder="0712 345 678"
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 text-lg font-bold text-slate-900 dark:text-white transition-all"
+                        />
+
+                        <button
+                            onClick={handleMpesaPay}
+                            disabled={loading}
+                            className="w-full mt-6 bg-brand-600 hover:bg-brand-700 text-white py-4 rounded-2xl font-bold transition-all shadow-lg shadow-brand-600/30 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                                    Sending prompt...
+                                </>
+                            ) : (
+                                'Send M-Pesa Prompt'
+                            )}
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

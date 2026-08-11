@@ -78,7 +78,7 @@ export default function QuranHome() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-12 pb-20 animate-in fade-in duration-700">
+        <div className="w-full space-y-12 pb-20 animate-in fade-in duration-700">
             {/* Hero Section */}
             <div className="relative p-12 overflow-hidden rounded-[3rem] text-white shadow-2xl mosque-hero-bg group">
                 <div className="absolute inset-0 bg-brand-900/60 backdrop-blur-[2px] transition-all group-hover:bg-brand-900/50"></div>

@@ -18,7 +18,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
         {
             title: 'CONTENT & MEDIA',
             items: [
-                { to: '/admin/content', icon: '📝', label: 'Career Notes Mgt' },
+                { to: '/admin/content', icon: '📝', label: 'Scholar Articles' },
                 { to: '/admin/fiqh', icon: '⚖️', label: 'Fiqh Library' },
                 { to: '/admin/worship', icon: '🕌', label: 'Worship Content' },
                 { to: '/admin/quran', icon: '📖', label: "Qur'an Management" }
@@ -55,19 +55,14 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
         <aside className={`fixed lg:sticky top-0 left-0 w-64 h-screen bg-white dark:bg-slate-950 border-r border-slate-100 dark:border-slate-800 flex flex-col z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             {/* Branding - Fixed Top */}
             <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm">
-                <div className="flex items-center gap-2 group cursor-pointer">
+<div className="flex items-center group cursor-pointer">
                     <img
-                        src="/deenflow-icon.svg"
-                        alt="DeenFlow Icon"
-                        className="w-8 h-8 lg:w-10 lg:h-10 transition-transform group-hover:scale-105 flex-shrink-0"
+                        src="/deenflow-logo.svg"
+                        alt="DeenFlow"
+                        className="h-9 lg:h-10 w-auto transition-transform group-hover:scale-[1.02]"
                     />
-                    <div>
-                        <img
-                            src="/deenflow-logo.svg"
-                            alt="DeenFlow"
-                            className="h-6 lg:h-7 w-auto"
-                        />
-                        <div className="text-[9px] lg:text-[10px] uppercase tracking-wider text-brand-600 dark:text-brand-400 font-bold mt-0.5">
+                    <div className="ml-2">
+                        <div className="text-[9px] lg:text-[10px] uppercase tracking-wider text-brand-600 dark:text-brand-400 font-bold">
                             Admin Portal
                         </div>
                     </div>
@@ -87,7 +82,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }) {
             {/* Scrollable Navigation */}
             <div className="flex-1 overflow-y-auto py-6 px-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 hover:scrollbar-thumb-slate-300 dark:hover:scrollbar-thumb-slate-600">
                 {/* Admin Profile Card */}
-                <div className="mb-8 p-1 rounded-2xl bg-gradient-to-br from-brand-500/10 via-purple-500/10 to-blue-500/10">
+<div className="mb-8 p-1 rounded-2xl bg-gradient-to-br from-brand-500/10 via-brand-600/10 to-brand-700/10">
                     <div className="p-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-xl border border-white/50 dark:border-slate-700/50">
                         <div className="flex items-center gap-3">
                             <div className="relative">

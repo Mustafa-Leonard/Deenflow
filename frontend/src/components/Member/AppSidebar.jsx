@@ -12,24 +12,17 @@ export default function AppSidebar({ isOpen, setIsOpen }) {
         <aside className={`fixed lg:sticky top-0 left-0 w-64 h-screen bg-white dark:bg-slate-950 border-r border-slate-100 dark:border-slate-800 flex flex-col z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             {/* Branding - Fixed Top */}
             <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-950/50 backdrop-blur-md">
-                <div className="flex items-center gap-2 group cursor-pointer">
+<div className="flex items-center group cursor-pointer">
                     <img
-                        src="/deenflow-icon.svg"
-                        alt="DeenFlow Icon"
-                        className="w-8 h-8 lg:w-10 lg:h-10 transition-transform group-hover:scale-105"
+                        src="/deenflow-logo.svg"
+                        alt="DeenFlow"
+                        className="h-9 lg:h-10 w-auto transition-transform group-hover:scale-[1.02]"
                     />
-                    <div>
-                        <img
-                            src="/deenflow-logo.svg"
-                            alt="DeenFlow"
-                            className="h-6 lg:h-7 w-auto"
-                        />
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
-                            <span className="text-[9px] lg:text-[10px] uppercase tracking-wider text-brand-600 dark:text-brand-400 font-bold">
-                                Member Portal
-                            </span>
-                        </div>
+                    <div className="ml-2 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+                        <span className="text-[9px] lg:text-[10px] uppercase tracking-wider text-brand-600 dark:text-brand-400 font-bold">
+                            Member Portal
+                        </span>
                     </div>
                 </div>
 

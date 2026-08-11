@@ -74,7 +74,7 @@ export default function DeenPlanner() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in slide-in-from-bottom duration-700">
+        <div className="w-full space-y-8 pb-20 animate-in fade-in slide-in-from-bottom duration-700">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 py-4">
                 <div>

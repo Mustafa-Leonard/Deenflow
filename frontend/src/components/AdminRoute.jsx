@@ -14,12 +14,14 @@ export default function AdminRoute({ children }) {
         )
     }
 
-    if (!user) {
-        return <Navigate to="/login" state={{ from: location }} replace />
+if (!user) {
+        // Admin area always routes to the dedicated Admin Portal login
+        return <Navigate to="/admin/login" state={{ from: location }} replace />
     }
 
     if (!user.is_admin) {
-        return <Navigate to="/" replace />
+        // Non-admin users can never enter the admin area
+        return <Navigate to="/app/dashboard" replace />
     }
 
     return children

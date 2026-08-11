@@ -6,6 +6,7 @@ export default function Profile() {
   const { user, updateProfile } = useContext(AuthContext)
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState({ type: '', text: '' })
   const [formData, setFormData] = useState({ full_name: '', email: '' })
 
   useEffect(() => {
@@ -20,11 +21,25 @@ export default function Profile() {
   const handleSave = async (e) => {
     e.preventDefault()
     setLoading(true)
+    setMessage({ type: '', text: '' })
     try {
       await updateProfile(formData)
       setIsEditing(false)
-    } catch (e) {
-      console.error(e)
+      setMessage({ type: 'success', text: 'Profile updated successfully!' })
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000)
+    } catch (err) {
+      console.error(err)
+      const detail = err.response?.data
+      let msg = 'Failed to save your profile. Please try again.'
+      if (typeof detail === 'string') msg = detail
+      else if (detail && typeof detail === 'object') {
+        const firstKey = Object.keys(detail)[0]
+        if (firstKey) {
+          const v = Array.isArray(detail[firstKey]) ? detail[firstKey][0] : detail[firstKey]
+          msg = typeof v === 'string' ? v : msg
+        }
+      }
+      setMessage({ type: 'error', text: msg })
     } finally {
       setLoading(false)
     }
@@ -45,6 +60,11 @@ export default function Profile() {
         </div>
 
         <form onSubmit={handleSave} className="space-y-8 relative z-10">
+          {message.text && (
+            <div className={`p-4 rounded-2xl font-bold text-sm text-center animate-in zoom-in duration-300 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400' : 'bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400'}`}>
+              {message.type === 'success' ? '✨ ' : '⚠️ '}{message.text}
+            </div>
+          )}
           <div className="flex items-center gap-6 pb-8 border-b border-slate-50 dark:border-slate-800">
             <div className="w-20 h-20 rounded-3xl bg-brand-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-brand-200">
               {user?.full_name?.charAt(0) || user?.username?.charAt(0) || 'U'}

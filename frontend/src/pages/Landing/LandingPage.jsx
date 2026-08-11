@@ -31,10 +31,12 @@ function LandingNavbar() {
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 select-none">
-          <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-sm shadow-green flex-shrink-0">
-            ☽
-          </div>
+<Link to="/" className="flex items-center gap-2 select-none">
+          <img
+            src="/deenflow-icon.svg"
+            alt="DeenFlow Icon"
+            className="w-8 h-8 md:w-9 md:h-9 flex-shrink-0 drop-shadow-lg"
+          />
           <span
             className="font-display font-bold text-xl tracking-tight"
             style={{ color: scrolled ? '#1a8f5c' : '#ffffff' }}
@@ -506,12 +508,17 @@ function LandingFooter() {
       <div className="max-w-7xl mx-auto px-6 pt-16 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 pb-12 border-b border-white/10">
           {/* Brand */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-9 h-9 rounded-lg bg-brand-400 flex items-center justify-center text-white font-bold text-sm">
-                ☽
+<div className="lg:col-span-1">
+            <div className="flex items-center gap-3 mb-6">
+              <img
+                src="/deenflow-icon.svg"
+                alt="DeenFlow Icon"
+                className="w-10 h-10 flex-shrink-0 drop-shadow-xl"
+              />
+              <div className="flex flex-col">
+                <span className="font-display font-bold text-xl text-white leading-none">DeenFlow</span>
+                <span className="text-[9px] uppercase tracking-[0.25em] font-bold text-white/60 mt-1">Islamic Guidance</span>
               </div>
-              <span className="font-display font-bold text-xl text-white">DeenFlow</span>
             </div>
             <p className="text-white/60 text-sm leading-relaxed mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
               Bridging timeless Islamic wisdom with modern technology.

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView, profile_view
+from .views import RegisterView, profile_view, MyTokenObtainPairView, MyTokenRefreshView
 from .admin_views import (
     admin_users_list, admin_user_detail, admin_dashboard_stats, admin_recent_activity, admin_ai_logs,
     admin_pending_reviews, admin_top_topics, admin_ai_log_detail, admin_ai_log_action,
@@ -26,11 +26,11 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('register', RegisterView.as_view()),
     
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token', TokenObtainPairView.as_view()),
+    path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token', MyTokenObtainPairView.as_view()),
     
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('token/refresh', TokenRefreshView.as_view()),
+    path('token/refresh/', MyTokenRefreshView.as_view(), name='token_refresh'),
+    path('token/refresh', MyTokenRefreshView.as_view()),
     
     path('profile/', profile_view, name='profile'),
     path('profile', profile_view),

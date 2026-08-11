@@ -26,6 +26,18 @@ export default function Login() {
         localStorage.removeItem('rememberedEmail')
       }
 
+      // Admin accounts MUST use the dedicated Admin Portal (/admin/login).
+      // They cannot enter through the standard member /login route.
+      if (user.is_admin) {
+        setError('Administrator accounts must sign in through the Admin Portal.')
+        // Log the session out so no admin token lingers on the member route
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
+        nav('/admin/login', { replace: true })
+        return
+      }
+
       const from = location.state?.from?.pathname || (user.is_admin ? '/admin/dashboard' : '/app/dashboard')
       nav(from, { replace: true })
     } catch (err) {
@@ -51,8 +63,8 @@ export default function Login() {
       <div className="hidden lg:flex lg:w-1/2 mosque-hero-bg relative items-center justify-center p-12 overflow-hidden">
         <div className="hero-overlay absolute inset-0" />
         <div className="relative z-10 max-w-md text-white">
-          <Link to="/" className="flex items-center gap-2 mb-10">
-            <div className="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-sm">☽</div>
+<Link to="/" className="flex items-center gap-2 mb-10">
+            <img src="/deenflow-icon.svg" alt="DeenFlow Icon" className="w-9 h-9 flex-shrink-0 drop-shadow-lg" />
             <span className="font-display font-bold text-2xl text-white">Deen<span className="text-brand-300">Flow</span></span>
           </Link>
 
@@ -83,8 +95,8 @@ export default function Login() {
       {/* Form Side */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 relative">
         {/* Mobile logo */}
-        <div className="absolute top-6 left-6 lg:hidden flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white text-xs font-bold">☽</div>
+<div className="absolute top-6 left-6 lg:hidden flex items-center gap-2">
+          <img src="/deenflow-icon.svg" alt="DeenFlow Icon" className="w-7 h-7 flex-shrink-0" />
           <span className="font-display font-bold text-lg text-brand-700">DeenFlow</span>
         </div>
 
