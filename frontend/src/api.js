@@ -38,9 +38,14 @@ instance.interceptors.response.use(
     // Don't intercept auth pages or refresh endpoint itself
     const authPages = ['/login', '/register', '/admin/login']
     const isAuthPage = authPages.some(p => window.location.pathname.startsWith(p))
-    const isRefreshEndpoint = originalRequest.url?.includes('/auth/token/refresh/')
 
-    if (err.response?.status === 401 && !originalRequest._retry && !isAuthPage && !isRefreshEndpoint) {
+    // Normalize request URL for reliable checks (axios may supply relative urls)
+    const reqUrlRaw = originalRequest?.url || ''
+    const reqUrl = String(reqUrlRaw).replace(/^\/+/,'') // remove leading slashes
+    const isRefreshEndpoint = reqUrl.includes('auth/token/refresh')
+    const isTokenEndpoint = reqUrl.includes('auth/token/')
+
+    if (err.response?.status === 401 && !originalRequest._retry && !isAuthPage && !isRefreshEndpoint && !isTokenEndpoint) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
@@ -58,7 +63,7 @@ instance.interceptors.response.use(
         isRefreshing = false
         localStorage.removeItem('access_token')
         localStorage.removeItem('user')
-        window.location.href = '/login'
+        window.location.replace('/login')
         return Promise.reject(err)
       }
 
@@ -76,7 +81,7 @@ instance.interceptors.response.use(
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
         localStorage.removeItem('user')
-        window.location.href = '/login'
+        window.location.replace('/login')
         return Promise.reject(refreshErr)
       } finally {
         isRefreshing = false
